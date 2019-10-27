@@ -3,12 +3,13 @@ var app      = express();
 var port     = process.env.PORT || 3000;
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
+var cors = require('cors');
 var session = require('express-session');
 var mongoose = require('mongoose');
 var passport = require('passport');
-var User = require('./model/user')
-var Quizz = require('./model/quizz')
-var Answer = require('./model/answer')
+var User = require('./model/user');
+var Quizz = require('./model/quizz');
+var Answer = require('./model/answer');
 
 
 // Conenct to DB
@@ -21,6 +22,15 @@ var db = mongoose.connection;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
+
+const corsOptions = {
+    origin: 'http://localhost:4200',
+    credentials: true,
+
+}
+
+app.use(cors(corsOptions));
+
 
 // Express Session
 app.use(session({
@@ -60,9 +70,7 @@ app.get('/quizz/:id', function(req, res) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     Quizz.getQuizzById(req.params.id, function (err, quizz) {
-        console.log(req.params.id);
         if (err) throw err;
-        console.log(quizz);
         res.send(quizz).end()
     })
 });
@@ -95,9 +103,7 @@ app.get('/answer/:id', function(req, res) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     Answer.getAnswerById(req.params.id, function (err, answer) {
-        console.log(req.params.id);
         if (err) throw err;
-        console.log(answer);
         res.send(answer).end()
     })
 });
@@ -115,9 +121,21 @@ app.post('/register', function(req, res){
             password: req.body.password
         });
 
-        User.createUser(newUser, function(err, user) {
-            if(err) throw err;
-            res.send(user).end()
+        User.createUser(newUser, function(user, err) {
+            if (err) {
+                var error;
+                if (err.name == 'ValidationError') {
+                    for (field in err.errors) {
+                        console.log(err.errors[field].message);
+                    }
+                    res.status(500).send(err.message).end();
+                } else {
+                    console.log(err);
+                    res.status(500).send(err).end();
+                }
+            } else {
+                res.send(user).end()
+            }
         });
     } else{
         res.status(500).send("{errors: \"Passwords don't match\"}").end()
@@ -179,7 +197,7 @@ app.get('/user', function(req, res){
 // Endpoint to logout
 app.get('/logout', function(req, res){
     req.logout();
-    res.send(null)
+    res.redirect('http://localhost:4200/');
 });
 
 app.post('/update', function(req, res){
@@ -238,7 +256,7 @@ app.get('/auth/facebook/callback',
     function(req, res) {
         // Successful authentication, redirect home.
         console.log(req.user);
-        res.redirect('/');
+        res.redirect('http://localhost:4200/?id='+req.user.facebook.id);
     }
 );
 
@@ -276,7 +294,7 @@ app.get('/auth/twitter/callback',
     function(req, res) {
         // Successful authentication, redirect home.
         console.log(req.user);
-        res.redirect('/');
+        res.redirect('http://localhost:4200/?id='+req.user.twitter.id);
     }
 );
 
