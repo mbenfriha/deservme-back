@@ -23,6 +23,9 @@ var QuizzSchema = mongoose.Schema({
     user_id: {
         type: String,
     },
+    title: {
+       type:string,
+    },
     answer: {
         type: Boolean,
         default: false,

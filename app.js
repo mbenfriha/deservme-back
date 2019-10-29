@@ -213,8 +213,27 @@ app.post('/update', function(req, res){
 
         }
     })
+});
 
-})
+app.get('/username/:username', function(req,res) {
+    if(!req.user) {
+        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+    } else {
+        User.getUserByUsername(req.params.username, function (err, user) {
+            if (err) {
+                res.status(404).send(err).end();
+            } else {
+                if(!user) {
+                    res.status(404).send(err).end();
+
+                } else{
+                    res.send(user).end();
+                }
+
+            }
+        })
+    }
+});
 
 
 var FacebookStrategy = require('passport-facebook').Strategy;
