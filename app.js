@@ -53,9 +53,12 @@ app.post('/quizz/create', function(req, res){
     if(req.body.questions) {
         var newQuizz = new Quizz({
             user_id: req.user._id,
+            username: req.user.username,
             answer: false,
             title: req.body.title,
-            questions: req.body.questions
+            questions: req.body.questions,
+            avatar: req.user.avatar,
+            avatar_type: req.user.avatar_type
         })
 
         Quizz.createQuizz(newQuizz, function (err, quizz) {
@@ -79,12 +82,22 @@ app.get('/quizz/:id', function(req, res) {
 });
 
 
-//get quizz by id
+//get all quizz
 app.get('/quizz', function(req, res) {
     if(!req.user) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
-    Quizz.getAll(function (err, quizzs) {
+    Quizz.getAll(req.user._id,function (err, quizzs) {
+        if (err) throw err;
+        res.send(quizzs).end()
+    })
+});
+
+app.get('/quizzs/:id', function(req, res) {
+    if(!req.user) {
+        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+    }
+    Quizz.getMyQuizz(req.params.id, function (err, quizzs) {
         if (err) throw err;
         res.send(quizzs).end()
     })
@@ -105,8 +118,17 @@ app.post('/answer/create/:quizz_id', function(req, res){
         })
 
         Answer.createAnswer(newAnswer, function (err, answer) {
-            if (err) throw err;
-            res.send(answer).end()
+            if (err){
+                res.status(500).send(err).end();
+            } else {
+                Quizz.addAnswer(req.params.quizz_id, function(err, quizz){
+                    if(err){
+                        res.status(500).send(err).end();
+                    } else {
+                        res.send(answer).end();
+                    }
+                })
+            }
         });
     }else{
         res.status(500).send("{errors: \"Answer is empty\"}").end()
@@ -121,6 +143,22 @@ app.get('/answer/:id', function(req, res) {
     Answer.getAnswerById(req.params.id, function (err, answer) {
         if (err) throw err;
         res.send(answer).end()
+    })
+});
+
+//get answer by quizz_id and user_id
+app.get('/answerUser/:quizz_id', function(req, res) {
+    if(!req.user) {
+        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+    }
+    Answer.getAnswerByUserId(req.user._id, req.params.quizz_id, function (err, answer) {
+        if (err) {
+            res.status(500).send(err).end();
+        } else if(!answer) {
+            res.status(404).send(err).end();
+        } else {
+            res.send(answer).end()
+        }
     })
 });
 
@@ -270,6 +308,8 @@ passport.use(new FacebookStrategy({
                 newUser.facebook.id = profile.id;
                 newUser.facebook.token = accessToken;
                 newUser.facebook.name  = profile.displayName;
+                newUser.avatar = profile.id;
+                newUser.avatar_type = 'facebook';
                 if (typeof profile.emails != 'undefined' && profile.emails.length > 0)
                     newUser.facebook.email = profile.emails[0].value;
 
@@ -310,6 +350,8 @@ passport.use(new TwitterStrategy({
             newUser.twitter.id = profile.id;
             newUser.twitter.name = profile.username;
             newUser.twitter.token = accessToken;
+            newUser.avatar = profile.username;
+            newUser.avatar_type = 'twitter';
 
             // save our user to the database
             newUser.save(function (err) {

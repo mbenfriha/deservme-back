@@ -29,6 +29,16 @@ var UserSchema = mongoose.Schema({
             message: 'Cet email a déjà été pris'
         }
     },
+    createdAt: {
+        type: Date,
+        default: Date.now
+    },
+    avatar: {
+        type : String,
+    },
+    avatar_type: {
+        type: String,
+    },
     facebook: {
         id           : String,
         token        : String,

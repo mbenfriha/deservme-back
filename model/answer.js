@@ -24,6 +24,9 @@ var AnswerSchema = mongoose.Schema({
     user_id: {
         type: String,
     },
+    title: {
+        type: String,
+    },
     quizz_id: {
         type: String,
     },
@@ -48,4 +51,8 @@ module.exports.createAnswer = function(newAnswer, callback) {
 module.exports.getAnswerById = function(id, callback) {
     console.log(id);
     Answer.findById(id).exec(callback);
+};
+
+module.exports.getAnswerByUserId = function(user_id, quizz_id, callback) {
+    Answer.findOne({user_id, quizz_id}).exec(callback);
 };
