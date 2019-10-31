@@ -30,6 +30,16 @@ var AnswerSchema = mongoose.Schema({
     quizz_id: {
         type: String,
     },
+
+    avatar: {
+        type : String,
+    },
+    avatar_type: {
+        type: String,
+    },
+    username: {
+        type : String,
+    },
     answer: {
         type: Boolean,
         default: true,
@@ -56,3 +66,10 @@ module.exports.getAnswerById = function(id, callback) {
 module.exports.getAnswerByUserId = function(user_id, quizz_id, callback) {
     Answer.findOne({user_id, quizz_id}).exec(callback);
 };
+
+
+module.exports.getAnswerByQuizz = function(quizz_id, callback) {
+    Answer.find({quizz_id}).exec(callback);
+};
+
+

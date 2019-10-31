@@ -114,7 +114,10 @@ app.post('/answer/create/:quizz_id', function(req, res){
             user_id: req.user._id,
             quizz_id: req.params.quizz_id,
             answer: true,
-            questions: req.body.questions
+            questions: req.body.questions,
+            username: req.user.username,
+            avatar: req.user.avatar,
+            avatar_type: req.user.avatar_type,
         })
 
         Answer.createAnswer(newAnswer, function (err, answer) {
@@ -141,6 +144,17 @@ app.get('/answer/:id', function(req, res) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     Answer.getAnswerById(req.params.id, function (err, answer) {
+        if (err) throw err;
+        res.send(answer).end()
+    })
+});
+
+//get all answers by quizz
+app.get('/answers/:id', function(req, res) {
+    if(!req.user) {
+        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+    }
+    Answer.getAnswerByQuizz(req.params.id, function (err, answer) {
         if (err) throw err;
         res.send(answer).end()
     })
