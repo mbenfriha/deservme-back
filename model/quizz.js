@@ -24,11 +24,15 @@ var QuizzSchema = mongoose.Schema({
         type: String,
     },
     title: {
-       type:string,
+       type: String,
     },
     answer: {
         type: Boolean,
         default: false,
+    },
+    createdAt: {
+        type: Date,
+        default: Date.now
     },
     questions: [QuestionSchema]
 });
@@ -43,4 +47,7 @@ module.exports.createQuizz = function(newQuizz, callback) {
 module.exports.getQuizzById = function(id, callback) {
     console.log(id);
     Quizz.findById(id).exec(callback);
+};
+module.exports.getAll = function(callback) {
+    Quizz.find({}).sort({createdAt: -1}).exec(callback);
 };

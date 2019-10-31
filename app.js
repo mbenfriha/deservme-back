@@ -48,10 +48,13 @@ app.post('/quizz/create', function(req, res){
     if(!req.user) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
+    console.log(req.body)
+
     if(req.body.questions) {
         var newQuizz = new Quizz({
             user_id: req.user._id,
             answer: false,
+            title: req.body.title,
             questions: req.body.questions
         })
 
@@ -74,6 +77,19 @@ app.get('/quizz/:id', function(req, res) {
         res.send(quizz).end()
     })
 });
+
+
+//get quizz by id
+app.get('/quizz', function(req, res) {
+    if(!req.user) {
+        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+    }
+    Quizz.getAll(function (err, quizzs) {
+        if (err) throw err;
+        res.send(quizzs).end()
+    })
+});
+
 
 //create answer
 app.post('/answer/create/:quizz_id', function(req, res){
