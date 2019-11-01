@@ -271,7 +271,7 @@ app.get('/user', function(req, res){
 // Endpoint to logout
 app.get('/logout', function(req, res){
     req.logout();
-    res.redirect('http://localhost:4200/');
+    res.redirect(urlFront);
 });
 
 app.post('/update', function(req, res){
