@@ -5,7 +5,7 @@ if (process.env.NODE_ENV == 'production') {
 var express  = require('express');
 var app      = express();
 var port     = process.env.PORT || 3000;
-const urlFront = process.env.FRONT || 'http://localhost:4200/';
+const urlFront = process.env.FRONT || 'http://localhost:4200';
 const urlBack = process.env.BACK || 'http://localhost:3000/';
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
@@ -59,20 +59,28 @@ app.post('/quizz/create', function(req, res){
     console.log(req.body)
 
     if(req.body.questions) {
-        var newQuizz = new Quizz({
-            user_id: req.user._id,
-            username: req.user.username,
-            answer: false,
-            title: req.body.title,
-            questions: req.body.questions,
-            avatar: req.user.avatar,
-            avatar_type: req.user.avatar_type
-        })
+        if(req.body.questions.length > 19) {
+            res.status(401).send("{errors: \"Un quizz ne peux comporter que 20 questions maximum\"}").end()
+        } else {
+            var newQuizz = new Quizz({
+                user_id: req.user._id,
+                username: req.user.username,
+                answer: false,
+                title: req.body.title,
+                questions: req.body.questions,
+                avatar: req.user.avatar,
+                avatar_type: req.user.avatar_type
+            })
 
-        Quizz.createQuizz(newQuizz, function (err, quizz) {
-            if (err) throw err;
-            res.send(quizz).end()
-        });
+            Quizz.createQuizz(newQuizz, function (err, quizz) {
+                if (err) {
+                    res.status(500).send(err).end()
+
+                }
+                res.send(quizz).end()
+            });
+        }
+
     }else{
         res.status(500).send("{errors: \"Questions is empty\"}").end()
     }

@@ -6,6 +6,12 @@ var mongoose = require('mongoose');
 var ChoiceSchema = mongoose.Schema({
     name: {
         type: String,
+        validate: {
+            validator: function(v) {
+                return v.length <= 50
+            },
+            message: 'Réponse trop longue '
+        }
     },
     rep: {
         type: Boolean,
@@ -15,6 +21,12 @@ var ChoiceSchema = mongoose.Schema({
 var QuestionSchema = mongoose.Schema({
     name: {
         type: String,
+        validate: {
+            validator: function(v) {
+                return v.length <= 80
+            },
+            message: 'Question trop longue '
+        }
     },
     choices: [ChoiceSchema]
 });
@@ -28,6 +40,12 @@ var QuizzSchema = mongoose.Schema({
     },
     title: {
        type: String,
+        validate: {
+            validator: function(v) {
+                return v.length <= 80
+            },
+            message: 'Titre du quizz trop long '
+        }
     },
     answer: {
         type: Boolean,

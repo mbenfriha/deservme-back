@@ -5,6 +5,7 @@ var bcrypt = require('bcryptjs');
 var UserSchema = mongoose.Schema({
     username: {
         type: String,
+        max: 20,
         validate: {
             validator: function (v, cb) {
                 User.find({username: v, _id:  { $ne: this._id }} , function (err, docs) {
