@@ -17,6 +17,8 @@ var User = require('./model/user');
 var Quizz = require('./model/quizz');
 var Answer = require('./model/answer');
 
+console.log(urlBack);
+
 
 // Conenct to DB
 mongoose.connect('mongodb://localhost/deservme');
