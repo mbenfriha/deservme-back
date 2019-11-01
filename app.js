@@ -1,6 +1,12 @@
+if (process.env.NODE_ENV == 'production') {
+    require('dotenv').config();
+    console.log('mode prod');
+}
 var express  = require('express');
 var app      = express();
 var port     = process.env.PORT || 3000;
+const urlFront = process.env.FRONT || 'http://localhost:4200/';
+const urlBack = process.env.BACK || 'http://localhost:3000/';
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var cors = require('cors');
@@ -24,7 +30,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 const corsOptions = {
-    origin: 'http://localhost:4200',
+    origin: urlFront,
     credentials: true,
 
 }
@@ -308,7 +314,7 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 passport.use(new FacebookStrategy({
         clientID: "396653554338782",
         clientSecret: "b5dc33715e87b087be735a95aa9f5f29",
-        callbackURL: "http://localhost:3000/auth/facebook/callback"
+        callbackURL: urlBack+"auth/facebook/callback"
     },
     function(accessToken, refreshToken, profile, done) {
         User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
@@ -345,7 +351,7 @@ app.get('/auth/facebook/callback',
     function(req, res) {
         // Successful authentication, redirect home.
         console.log(req.user);
-        res.redirect('http://localhost:4200/?id='+req.user.facebook.id);
+        res.redirect(urlFront+'?id='+req.user.facebook.id);
     }
 );
 
@@ -354,7 +360,7 @@ TwitterStrategy = require("passport-twitter").Strategy;
 passport.use(new TwitterStrategy({
     consumerKey: "X4qBi8l1UYL67vyPXfs31arS1",
     consumerSecret: "043rfnI0XWmhMj5QEpP9sxjAwp60uf2WokmUa9oRSn78tj9BZg",
-    callbackURL: "http://localhost:3000/auth/twitter/callback"
+    callbackURL: urlBack+"auth/twitter/callback"
 }, function(accessToken, refreshToken, profile, done) {
     return User.findOne({ 'twitter.id': profile.id }, function(err, user) {
         if (err) return done(err);
@@ -385,9 +391,9 @@ app.get('/auth/twitter/callback',
     function(req, res) {
         // Successful authentication, redirect home.
         console.log(req.user);
-        res.redirect('http://localhost:4200/?id='+req.user.twitter.id);
+        res.redirect(urlFront+'?id='+req.user.twitter.id);
     }
 );
 
 
-app.listen(3000, () => console.log('App listening on port 3000!'))
+app.listen(port, () => console.log('App listening on port '+port))
