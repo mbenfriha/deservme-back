@@ -8,7 +8,7 @@ var ChoiceSchema = mongoose.Schema({
         type: String,
         validate: {
             validator: function(v) {
-                return v.length <= 50
+                return v.length <= 40
             },
             message: 'Réponse trop longue '
         }
@@ -23,7 +23,7 @@ var QuestionSchema = mongoose.Schema({
         type: String,
         validate: {
             validator: function(v) {
-                return v.length <= 80
+                return v.length <= 50
             },
             message: 'Question trop longue '
         }
@@ -42,7 +42,7 @@ var QuizzSchema = mongoose.Schema({
        type: String,
         validate: {
             validator: function(v) {
-                return v.length <= 80
+                return v.length <= 50
             },
             message: 'Titre du quizz trop long '
         }
