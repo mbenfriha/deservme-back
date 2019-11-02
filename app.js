@@ -92,8 +92,12 @@ app.get('/quizz/:id', function(req, res) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     Quizz.getQuizzById(req.params.id, function (err, quizz) {
-        if (err) throw err;
-        res.send(quizz).end()
+        if (err) {
+            res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
+        } else {
+            res.send(quizz).end()
+
+        }
     })
 });
 
@@ -104,7 +108,10 @@ app.get('/quizz', function(req, res) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     Quizz.getAll(req.user._id,function (err, quizzs) {
-        if (err) throw err;
+        if (err) {
+            res.status(500).send("{errors: \"Une erreur est survenue\"}").end()
+
+        }
         res.send(quizzs).end()
     })
 });
@@ -132,6 +139,7 @@ app.post('/answer/create/:quizz_id', function(req, res){
             answer: true,
             questions: req.body.questions,
             username: req.user.username,
+            title: req.body.title,
             avatar: req.user.avatar,
             avatar_type: req.user.avatar_type,
         })
