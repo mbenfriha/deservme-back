@@ -95,7 +95,12 @@ app.get('/quizz/:id', function(req, res) {
         if (err) {
             res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
         } else {
-            res.send(quizz).end()
+            if(!quizz){
+                res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
+            } else {
+                res.send(quizz).end()
+
+            }
 
         }
     })
