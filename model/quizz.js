@@ -55,6 +55,10 @@ var QuizzSchema = mongoose.Schema({
         type: Number,
         default: 0
     },
+    private: {
+        type: Boolean,
+        default: false,
+    },
     avatar: {
         type : String,
     },
@@ -84,7 +88,7 @@ module.exports.getQuizzById = function(id, callback) {
     Quizz.findById(id).exec(callback);
 };
 module.exports.getAll = function(user_id, callback) {
-    Quizz.find({user_id: {$ne: user_id}, createdAt: { $gte: new Date((new Date().getTime() - (7 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(20).exec(callback);
+    Quizz.find({user_id: {$ne: user_id}, private: false, createdAt: { $gte: new Date((new Date().getTime() - (7 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(20).exec(callback);
 };
 
 module.exports.getAllQuizz = function(callback) {
