@@ -21,7 +21,7 @@ var QuestionSchema = mongoose.Schema({
         type: String,
         validate: {
             validator: function(v) {
-                return v.length <=  50
+                return v.length <=  90
             },
             message: 'Question trop longue '
         }

@@ -93,10 +93,10 @@ app.post('/quizz/create', function(req, res){
 
 //get quizz by id
 app.get('/quizz/:id', function(req, res) {
-    if(!req.user || req.banned) {
+   /* if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     } else
-    {
+    {*/
         Quizz.getQuizzById(req.params.id, function (err, quizz) {
             if (err) {
                 res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
@@ -109,7 +109,7 @@ app.get('/quizz/:id', function(req, res) {
 
             }
         })
-    }
+    // }
 
 });
 
@@ -131,19 +131,20 @@ app.get('/quizz', function(req, res) {
 app.get('/quizzs/:id', function(req, res) {
     if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
-    }
-    Quizz.getMyQuizz(req.params.id, function (err, quizzs) {
-        if (err) {
-            res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
-        } else {
-            if(!quizzs){
+    } else {
+        Quizz.getMyQuizz(req.params.id, function (err, quizzs) {
+            if (err) {
                 res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
             } else {
-                res.send(quizzs).end()
-            }
+                if (!quizzs) {
+                    res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
+                } else {
+                    res.send(quizzs).end()
+                }
 
-        }
-    })
+            }
+        })
+    }
 });
 
 
@@ -420,7 +421,7 @@ passport.use(new FacebookStrategy({
                 newUser.facebook.name  = profile.displayName;
                 newUser.avatar = profile.id;
                 newUser.avatar_type = 'facebook';
-                console.log(profile._json);
+                console.log(profile._json.picture.data.url);
 
                 // save our user to the database
                 newUser.save(function(err, user) {
