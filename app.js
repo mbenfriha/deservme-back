@@ -424,7 +424,7 @@ passport.use(new FacebookStrategy({
                 newUser.save(function(err, user) {
                     if (err) throw err;
                     options = {
-                        url: profile._json.data.profile_picture,
+                        url: profile._json.picture.data.url,
                         dest: __dirname+'/uploads/profile/'+user._id+'.jpg'      // Save to /path/to/dest/photo.jpg
                     }
 
