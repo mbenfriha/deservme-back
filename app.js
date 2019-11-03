@@ -13,9 +13,14 @@ var cors = require('cors');
 var session = require('express-session');
 var mongoose = require('mongoose');
 var passport = require('passport');
+const download = require('image-downloader');
+
+
 var User = require('./model/user');
 var Quizz = require('./model/quizz');
 var Answer = require('./model/answer');
+var Report = require('./model/report');
+
 
 console.log(urlBack);
 
@@ -53,7 +58,7 @@ app.use(passport.session());
 
 //create quizz
 app.post('/quizz/create', function(req, res){
-    if(!req.user) {
+    if(!req.user|| req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     console.log(req.body)
@@ -88,28 +93,30 @@ app.post('/quizz/create', function(req, res){
 
 //get quizz by id
 app.get('/quizz/:id', function(req, res) {
-    if(!req.user) {
+    if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
-    }
-    Quizz.getQuizzById(req.params.id, function (err, quizz) {
-        if (err) {
-            res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
-        } else {
-            if(!quizz){
+    } else
+    {
+        Quizz.getQuizzById(req.params.id, function (err, quizz) {
+            if (err) {
                 res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
             } else {
-                res.send(quizz).end()
+                if(!quizz){
+                    res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
+                } else {
+                    res.send(quizz).end()
+                }
 
             }
+        })
+    }
 
-        }
-    })
 });
 
 
 //get all quizz
 app.get('/quizz', function(req, res) {
-    if(!req.user) {
+    if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     Quizz.getAll(req.user._id,function (err, quizzs) {
@@ -122,19 +129,27 @@ app.get('/quizz', function(req, res) {
 });
 
 app.get('/quizzs/:id', function(req, res) {
-    if(!req.user) {
+    if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     Quizz.getMyQuizz(req.params.id, function (err, quizzs) {
-        if (err) throw err;
-        res.send(quizzs).end()
+        if (err) {
+            res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
+        } else {
+            if(!quizzs){
+                res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
+            } else {
+                res.send(quizzs).end()
+            }
+
+        }
     })
 });
 
 
 //create answer
 app.post('/answer/create/:quizz_id', function(req, res){
-    if(!req.user) {
+    if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     if(req.body.questions) {
@@ -169,29 +184,45 @@ app.post('/answer/create/:quizz_id', function(req, res){
 
 //get answer by id
 app.get('/answer/:id', function(req, res) {
-    if(!req.user) {
+    if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     Answer.getAnswerById(req.params.id, function (err, answer) {
-        if (err) throw err;
-        res.send(answer).end()
+        if (err) {
+            res.status(404).send("{errors: \"Cette réponse n'existe pas\"}").end()
+        } else {
+            if(!answer){
+                res.status(404).send("{errors: \"Cette réponse n'existe pas\"}").end()
+            } else {
+                res.send(answer).end()
+            }
+
+        }
     })
 });
 
 //get all answers by quizz
 app.get('/answers/:id', function(req, res) {
-    if(!req.user) {
+    if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     Answer.getAnswerByQuizz(req.params.id, function (err, answer) {
-        if (err) throw err;
-        res.send(answer).end()
+        if (err) {
+            res.status(404).send("{errors: \"Cette réponse n'existe pas\"}").end()
+        } else {
+            if(!answer){
+                res.status(404).send("{errors: \"Cette réponse n'existe pas\"}").end()
+            } else {
+                res.send(answer).end()
+            }
+
+        }
     })
 });
 
 //get answer by quizz_id and user_id
 app.get('/answerUser/:quizz_id', function(req, res) {
-    if(!req.user) {
+    if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
     Answer.getAnswerByUserId(req.user._id, req.params.quizz_id, function (err, answer) {
@@ -240,6 +271,37 @@ app.post('/register', function(req, res){
 });
 
 
+
+//create report
+app.get('/report/:quizz_id', function(req, res){
+    if(!req.user || req.banned) {
+        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+    } else {
+        Report.getReport(req.params.quizz_id, req.user._id, function(err, report) {
+            if(!report) {
+                var newReport = new Report({
+                    user_id: req.user._id,
+                    quizz_id: req.params.quizz_id,
+                })
+
+                Report.createReport(newReport, function (err, report) {
+                    if (err){
+                        res.status(500).send(err).end();
+                    } else {
+                        res.send(report).end()
+                    }
+                });
+            } else {
+                res.status(500).send("{errors: \"Déjà signalé\"}").end()
+            }
+        })
+
+
+    }
+
+});
+
+
 var LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy({
         usernameField: 'email',
@@ -247,12 +309,16 @@ passport.use(new LocalStrategy({
     },
     function(username, password, done) {
         User.findOne({ email: username }, function(err, user){
-            if(err) throw err;
+            if(err) {
+                res.status(500).send(err).end();
+            };
             if(!user){
                 return done(null, false, {message: 'Unknown User'});
             }
             User.comparePassword(password, user.password, function(err, isMatch){
-                if(err) throw err;
+                if(err) {
+                    res.status(500).send(err).end();
+                };
                 if(isMatch){
                     return done(null, user);
                 } else {
@@ -284,7 +350,7 @@ app.post('/login',
 
 // Endpoint to get current user
 app.get('/user', function(req, res){
-    if(!req.user) {
+    if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
         res.send(req.user);
@@ -298,7 +364,7 @@ app.get('/logout', function(req, res){
 });
 
 app.post('/update', function(req, res){
-    if(!req.user){
+    if(!req.user || req.banned){
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     }
    // console.log(req.user);
@@ -313,7 +379,7 @@ app.post('/update', function(req, res){
 });
 
 app.get('/username/:username', function(req,res) {
-    if(!req.user) {
+    if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     } else {
         User.getUserByUsername(req.params.username, function (err, user) {
@@ -353,12 +419,21 @@ passport.use(new FacebookStrategy({
                 newUser.facebook.name  = profile.displayName;
                 newUser.avatar = profile.id;
                 newUser.avatar_type = 'facebook';
-                if (typeof profile.emails != 'undefined' && profile.emails.length > 0)
-                    newUser.facebook.email = profile.emails[0].value;
 
                 // save our user to the database
-                newUser.save(function(err) {
+                newUser.save(function(err, user) {
                     if (err) throw err;
+                    options = {
+                        url: profile._json.data.profile_picture,
+                        dest: './uploads/profile/'+user._id+'.jpg'      // Save to /path/to/dest/photo.jpg
+                    }
+
+                    download.image(options)
+                        .then(({ filename, image }) => {
+                            console.log('Saved to', filename)  // Saved to /path/to/dest/photo.jpg
+                        })
+                        .catch((err) => console.error(err));
+
                     return done(null, newUser);
                 });
             }
@@ -387,7 +462,7 @@ passport.use(new TwitterStrategy({
 }, function(accessToken, refreshToken, profile, done) {
     return User.findOne({ 'twitter.id': profile.id }, function(err, user) {
         if (err) return done(err);
-        if (user) return done(null, user);
+        if (user) return done(null, user) ;
         else {
             var newUser = new User;
             newUser.twitter.id = profile.id;
@@ -396,14 +471,28 @@ passport.use(new TwitterStrategy({
             newUser.avatar = profile.username;
             newUser.avatar_type = 'twitter';
 
+
+
             // save our user to the database
-            newUser.save(function (err) {
+            newUser.save(function (err, user) {
                 if (err) throw err;
+                options = {
+                    url: profile._json.profile_image_url,
+                    dest: './uploads/profile/'+user._id+'.jpg'      // Save to /path/to/dest/photo.jpg
+                }
+
+                download.image(options)
+                    .then(({ filename, image }) => {
+                        console.log('Saved to', filename)  // Saved to /path/to/dest/photo.jpg
+                    })
+                    .catch((err) => console.error(err));
+
                 return done(null, newUser);
             });
         }
     });
-}));
+})
+);
 
 
 app.get('/auth/twitter',
@@ -418,5 +507,64 @@ app.get('/auth/twitter/callback',
     }
 );
 
+InstagramStrategy = require("passport-instagram").Strategy;
+passport.use(new InstagramStrategy({
+        clientID: "39c17946070a479abe4be0b18572cc09",
+        clientSecret: "a30e8470ac8347cc9e4995d04b43fda5",
+        callbackURL: urlBack+"auth/instagram/callback"
+    },
+    function(accessToken, refreshToken, profile, done) {
+        User.findOne({ 'instagram.id' : profile.id }, function(err, user) {
+            if (err) return done(err);
+            if (user) return done(null, user);
+            else {
+                // if there is no user found with that facebook id, create them
+                var newUser = new User();
 
+                // set all of the facebook information in our user model
+                newUser.instagram.id = profile.id;
+                newUser.instagram.token = accessToken;
+                newUser.instagram.name  = profile.username;
+                newUser.avatar = profile.username;
+                newUser.avatar_type = 'instagram';
+
+
+
+                // save our user to the database
+                newUser.save(function(err, user) {
+                    if (err) throw err;
+                    // Download to a directory and save with an another filename
+                    options = {
+                        url: profile._json.data.profile_picture,
+                        dest: './uploads/profile/'+user._id+'.jpg'      // Save to /path/to/dest/photo.jpg
+                    }
+
+                    download.image(options)
+                        .then(({ filename, image }) => {
+                            console.log('Saved to', filename)  // Saved to /path/to/dest/photo.jpg
+                        })
+                        .catch((err) => console.error(err));
+
+                    return done(null, newUser);
+                });
+            }
+        });
+    }
+));
+
+
+app.get('/auth/instagram',
+    passport.authenticate('instagram'));
+
+app.get('/auth/instagram/callback',
+    passport.authenticate('instagram', { failureRedirect: '/login' }),
+    function(req, res) {
+        // Successful authentication, redirect home.
+        console.log(req.user);
+        res.redirect(urlFront+'?id='+req.user.twitter.id);
+    }
+);
+
+
+app.use('/avatar', express.static('uploads/profile'));
 app.listen(port, () => console.log('App listening on port '+port))

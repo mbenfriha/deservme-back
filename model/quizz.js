@@ -65,7 +65,11 @@ var QuizzSchema = mongoose.Schema({
         type: Date,
         default: Date.now
     },
-    questions: [QuestionSchema]
+    questions: [QuestionSchema],
+    deleted: {
+        type: Boolean,
+        default: false,
+    }
 });
 
 
