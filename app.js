@@ -558,6 +558,41 @@ passport.use(new InstagramStrategy({
 ));
 
 
+// stats
+
+app.get('/admin/allUsers', function(req,res) {
+
+    User.getAll(function (err, user) {
+
+        if(user) {
+            var html = "<div>" + user.length + "</div>";
+             user.map(u => {
+                 html += "<div>" + u.username + "</div>";
+             })
+            console.log(html);
+            res.end(html)
+            // res.send(user).end();
+        }
+    })
+});
+
+
+app.get('/admin/allQuizz', function(req,res) {
+
+    Quizz.getAllQuizz(function (err, quizz) {
+
+        if(quizz) {
+            var html = "<div>" + quizz.length + "</div>";
+            quizz.map(q => {
+                html += "<div>" + q.title + "</div>";
+            })
+            console.log(html);
+            res.end(html)
+            // res.send(user).end();
+        }
+    })
+});
+
 app.get('/auth/instagram',
     passport.authenticate('instagram'));
 

@@ -122,3 +122,8 @@ module.exports.comparePassword = function(candidatePassword, hash, callback){
         callback(null, isMatch);
     });
 }
+
+module.exports.getAll = function(callback){
+    User.find().exec(callback);
+}
+

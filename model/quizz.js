@@ -86,6 +86,10 @@ module.exports.getQuizzById = function(id, callback) {
 module.exports.getAll = function(user_id, callback) {
     Quizz.find({user_id: {$ne: user_id}, createdAt: { $gte: new Date((new Date().getTime() - (7 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(20).exec(callback);
 };
+
+module.exports.getAllQuizz = function(callback) {
+    Quizz.find().sort({date: 'desc'}).exec(callback);
+};
 module.exports.getMyQuizz = function(id, callback) {
     Quizz.find({user_id: id}).sort({createdAt: -1}).exec(callback);
 };
