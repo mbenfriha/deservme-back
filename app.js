@@ -403,7 +403,8 @@ var FacebookStrategy = require('passport-facebook').Strategy;
 passport.use(new FacebookStrategy({
         clientID: "396653554338782",
         clientSecret: "b5dc33715e87b087be735a95aa9f5f29",
-        callbackURL: urlBack+"auth/facebook/callback"
+        callbackURL: urlBack+"auth/facebook/callback",
+        profileFields: ['id', 'displayName', 'photos', 'email']
     },
     function(accessToken, refreshToken, profile, done) {
         User.findOne({ 'facebook.id' : profile.id }, function(err, user) {
@@ -419,6 +420,7 @@ passport.use(new FacebookStrategy({
                 newUser.facebook.name  = profile.displayName;
                 newUser.avatar = profile.id;
                 newUser.avatar_type = 'facebook';
+                console.log(profile._json);
 
                 // save our user to the database
                 newUser.save(function(err, user) {
