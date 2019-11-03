@@ -568,5 +568,5 @@ app.get('/auth/instagram/callback',
 );
 
 
-app.use('/avatar', express.static('uploads/profile'));
+app.use('/avatar', express.static(__dirname+'/uploads/profile'));
 app.listen(port, () => console.log('App listening on port '+port))
