@@ -478,7 +478,7 @@ passport.use(new TwitterStrategy({
                 if (err) throw err;
                 options = {
                     url: profile._json.profile_image_url,
-                    dest: __dirname+'./uploads/profile/'+user._id+'.jpg'      // Save to /path/to/dest/photo.jpg
+                    dest: __dirname+'/uploads/profile/'+user._id+'.jpg'      // Save to /path/to/dest/photo.jpg
                 }
 
                 download.image(options)
@@ -536,7 +536,7 @@ passport.use(new InstagramStrategy({
                     // Download to a directory and save with an another filename
                     options = {
                         url: profile._json.data.profile_picture,
-                        dest: __dirname+'./uploads/profile/'+user._id+'.jpg'      // Save to /path/to/dest/photo.jpg
+                        dest: __dirname+'/uploads/profile/'+user._id+'.jpg'      // Save to /path/to/dest/photo.jpg
                     }
 
                     download.image(options)
@@ -545,7 +545,7 @@ passport.use(new InstagramStrategy({
                         })
                         .catch((err) => console.error(err));
 
-                    console.log(__dirname+'./uploads/profile/'+user._id+'.jpg');
+                    console.log(__dirname+'/uploads/profile/'+user._id+'.jpg');
 
                     return done(null, newUser);
                 });
