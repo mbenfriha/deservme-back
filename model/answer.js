@@ -92,7 +92,7 @@ module.exports.getAnswerByUserId = function(user_id, quizz_id, callback) {
 
 
 module.exports.getAnswerByQuizz = function(quizz_id, callback) {
-    Answer.find({quizz_id, deleted: false}).exec(callback);
+    Answer.find({quizz_id, deleted: false}).sort({createdAt: -1}).exec(callback);
 };
 
 
