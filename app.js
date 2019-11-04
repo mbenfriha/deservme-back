@@ -150,20 +150,37 @@ app.get('/quizzs/:id', function(req, res) {
 
 //create answer
 app.post('/answer/create/:quizz_id', function(req, res){
-    if(!req.user || req.banned) {
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+    if(req.user) {
+        User.getUserById(req.user._id, function(err, user) {
+            if(user.banned) {
+                res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+            }
+        })
     }
     if(req.body.questions) {
-        var newAnswer = new Answer({
-            user_id: req.user._id,
-            quizz_id: req.params.quizz_id,
-            answer: true,
-            questions: req.body.questions,
-            username: req.user.username,
-            title: req.body.title,
-            avatar: req.user.avatar,
-            avatar_type: req.user.avatar_type,
-        })
+        if(req.user) {
+            var newAnswer = new Answer({
+                user_id: req.user._id,
+                quizz_id: req.params.quizz_id,
+                answer: true,
+                questions: req.body.questions,
+                username: req.user.username,
+                title: req.body.title,
+                avatar: req.user.avatar,
+                avatar_type: req.user.avatar_type,
+                registerd_user: true,
+            })
+
+        } else {
+            var newAnswer = new Answer({
+                quizz_id: req.params.quizz_id,
+                answer: true,
+                questions: req.body.questions,
+                username: req.body.username,
+                title: req.body.title,
+                registerd_user: false,
+            })
+        }
 
         Answer.createAnswer(newAnswer, function (err, answer) {
             if (err){
@@ -204,9 +221,6 @@ app.get('/answer/:id', function(req, res) {
 
 //get all answers by quizz
 app.get('/answers/:id', function(req, res) {
-    if(!req.user || req.banned) {
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
-    }
     Answer.getAnswerByQuizz(req.params.id, function (err, answer) {
         if (err) {
             res.status(404).send("{errors: \"Cette réponse n'existe pas\"}").end()

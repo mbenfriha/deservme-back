@@ -52,8 +52,9 @@ var AnswerSchema = mongoose.Schema({
     avatar: {
         type : String,
     },
-    avatar_type: {
-        type: String,
+    registered_user: {
+        type: Boolean,
+        default: false,
     },
     username: {
         type : String,
@@ -65,6 +66,10 @@ var AnswerSchema = mongoose.Schema({
     createdAt: {
         type: Date,
         default: Date.now
+    },
+    deleted: {
+        type: Boolean,
+        default: false
     },
     questions: [QuestionSchema]
 });
@@ -87,7 +92,7 @@ module.exports.getAnswerByUserId = function(user_id, quizz_id, callback) {
 
 
 module.exports.getAnswerByQuizz = function(quizz_id, callback) {
-    Answer.find({quizz_id}).exec(callback);
+    Answer.find({quizz_id, deleted: false}).exec(callback);
 };
 
 
