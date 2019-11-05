@@ -74,7 +74,8 @@ app.post('/quizz/create', function(req, res){
                 title: req.body.title,
                 questions: req.body.questions,
                 avatar: req.user.avatar,
-                avatar_type: req.user.avatar_type
+                avatar_type: req.user.avatar_type,
+                private: req.body.private
             })
 
             Quizz.createQuizz(newQuizz, function (err, quizz) {
