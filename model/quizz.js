@@ -88,7 +88,7 @@ module.exports.getQuizzById = function(id, callback) {
     Quizz.findById(id).exec(callback);
 };
 module.exports.getAll = function(user_id, callback) {
-    Quizz.find({user_id: {$ne: user_id}, private: false, createdAt: { $gte: new Date((new Date().getTime() - (7 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(20).exec(callback);
+    Quizz.find({user_id: {$ne: user_id}, private: false, deleted: false, createdAt: { $gte: new Date((new Date().getTime() - (7 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(20).exec(callback);
 };
 
 module.exports.getAllQuizz = function(callback) {
@@ -96,10 +96,10 @@ module.exports.getAllQuizz = function(callback) {
 };
 module.exports.getMyQuizz = function(id, priv, callback) {
     if(priv) {
-        Quizz.find({user_id: id}).sort({createdAt: -1}).exec(callback);
+        Quizz.find({user_id: id, deleted: false}).sort({createdAt: -1}).exec(callback);
 
     } else {
-        Quizz.find({user_id: id, private: false}).sort({createdAt: -1}).exec(callback);
+        Quizz.find({user_id: id, private: false,  deleted: false}).sort({createdAt: -1}).exec(callback);
     }
 };
 
@@ -108,8 +108,28 @@ module.exports.addAnswer = function(quizz_id, callback) {
     Quizz.findById(quizz_id, function(err, quizz) {
         console.log(quizz);
         quizz.answer_count = quizz.answer_count+1;
-            quizz.save(function(err) {
-                callback(err, quizz);
-            });
+        quizz.save(function(err) {
+            callback(err, quizz);
+        });
+    });
+}
+
+
+module.exports.changeState = function(quizz_id, callback) {
+    Quizz.findById(quizz_id, function(err, quizz) {
+        quizz.private = !quizz.private;
+        quizz.save(function(err) {
+            callback(err, quizz);
+        });
+    });
+}
+
+
+module.exports.deleteQuizz = function(quizz_id, callback) {
+    Quizz.findById(quizz_id, function(err, quizz) {
+        quizz.deleted = true;
+        quizz.save(function(err) {
+            callback(err, quizz);
+        });
     });
 }

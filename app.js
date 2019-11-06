@@ -105,7 +105,11 @@ app.get('/quizz/:id', function(req, res) {
                 if(!quizz){
                     res.status(404).send({message: "Ce quizz n'existe pas"}).end()
                 } else {
-                    res.send(quizz).end()
+                    if(quizz.deleted) {
+                        res.status(404).send({message: "Ce quizz n'existe pas"}).end()
+                    } else {
+                        res.send(quizz).end()
+                    }
                 }
 
             }
@@ -417,6 +421,17 @@ app.get('/user/:id', function(req, res) {
     }, (err) => res.status(404).send(err).end())
 })
 
+app.get('/changeQuizz/:id', function(req, res) {
+    Quizz.changeState(req.params.id, function(err, quizz) {
+        res.send(quizz).end()
+    },(err) => res.status(500).send(err).end())
+});
+
+app.get('/deleteQuizz/:id', function(req, res) {
+    Quizz.deleteQuizz(req.params.id, function(err, quizz) {
+        res.send(quizz).end()
+    },(err) => res.status(500).send(err).end())
+});
 
 var FacebookStrategy = require('passport-facebook').Strategy;
 passport.use(new FacebookStrategy({
