@@ -59,13 +59,13 @@ app.use(passport.session());
 //create quizz
 app.post('/quizz/create', function(req, res){
     if(!req.user|| req.banned) {
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
     }
     console.log(req.body)
 
     if(req.body.questions) {
         if(req.body.questions.length > 19) {
-            res.status(401).send("{errors: \"Un quizz ne peux comporter que 20 questions maximum\"}").end()
+            res.status(401).send({message: "Un quizz ne peux comporter que 20 questions maximum"}).end()
         } else {
             var newQuizz = new Quizz({
                 user_id: req.user._id,
@@ -88,7 +88,7 @@ app.post('/quizz/create', function(req, res){
         }
 
     }else{
-        res.status(500).send("{errors: \"Questions is empty\"}").end()
+        res.status(500).send({message: "Questions is empty"}).end()
     }
 });
 
@@ -100,10 +100,10 @@ app.get('/quizz/:id', function(req, res) {
     {*/
         Quizz.getQuizzById(req.params.id, function (err, quizz) {
             if (err) {
-                res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
+                res.status(404).send({message: "Ce quizz n'existe pas"}).end()
             } else {
                 if(!quizz){
-                    res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
+                    res.status(404).send({message: "Ce quizz n'existe pas"}).end()
                 } else {
                     res.send(quizz).end()
                 }
@@ -118,11 +118,11 @@ app.get('/quizz/:id', function(req, res) {
 //get all quizz
 app.get('/quizz', function(req, res) {
     if(!req.user || req.banned) {
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
     }
     Quizz.getAll(req.user._id,function (err, quizzs) {
         if (err) {
-            res.status(500).send("{errors: \"Une erreur est survenue\"}").end()
+            res.status(500).send({message: "Une erreur est survenue"}).end()
 
         }
         res.send(quizzs).end()
@@ -131,14 +131,14 @@ app.get('/quizz', function(req, res) {
 
 app.get('/quizzs/:id', function(req, res) {
     if(!req.user || req.banned) {
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
     } else {
         Quizz.getMyQuizz(req.params.id, true, function (err, quizzs) {
             if (err) {
-                res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
+                res.status(404).send({message: "Ce quizz n'existe pas"}).end()
             } else {
                 if (!quizzs) {
-                    res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
+                    res.status(404).send({message: "Ce quizz n'existe pas"}).end()
                 } else {
                     res.send(quizzs).end()
                 }
@@ -154,7 +154,7 @@ app.post('/answer/create/:quizz_id', function(req, res){
     if(req.user) {
         User.getUserById(req.user._id, function(err, user) {
             if(user.banned) {
-                res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+                res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
             }
         })
     }
@@ -204,14 +204,14 @@ app.post('/answer/create/:quizz_id', function(req, res){
 //get answer by id
 app.get('/answer/:id', function(req, res) {
     if(!req.user || req.banned) {
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
     }
     Answer.getAnswerById(req.params.id, function (err, answer) {
         if (err) {
-            res.status(404).send("{errors: \"Cette réponse n'existe pas\"}").end()
+            res.status(404).send({message: "Cette réponse n'existe pas"}).end()
         } else {
             if(!answer){
-                res.status(404).send("{errors: \"Cette réponse n'existe pas\"}").end()
+                res.status(404).send({message: "Cette réponse n'existe pas"}).end()
             } else {
                 res.send(answer).end()
             }
@@ -224,10 +224,10 @@ app.get('/answer/:id', function(req, res) {
 app.get('/answers/:id', function(req, res) {
     Answer.getAnswerByQuizz(req.params.id, function (err, answer) {
         if (err) {
-            res.status(404).send("{errors: \"Cette réponse n'existe pas\"}").end()
+            res.status(404).send({message: "Cette réponse n'existe pas"}).end()
         } else {
             if(!answer){
-                res.status(404).send("{errors: \"Cette réponse n'existe pas\"}").end()
+                res.status(404).send({message: "Cette réponse n'existe pas"}).end()
             } else {
                 res.send(answer).end()
             }
@@ -239,7 +239,7 @@ app.get('/answers/:id', function(req, res) {
 //get answer by quizz_id and user_id
 app.get('/answerUser/:quizz_id', function(req, res) {
     if(!req.user || req.banned) {
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
     }
     Answer.getAnswerByUserId(req.user._id, req.params.quizz_id, function (err, answer) {
         if (err) {
@@ -282,7 +282,7 @@ app.post('/register', function(req, res){
             }
         });
     } else{
-        res.status(500).send("{errors: \"Passwords don't match\"}").end()
+        res.status(500).send({message: "Passwords don't match"}).end()
     }
 });
 
@@ -290,31 +290,25 @@ app.post('/register', function(req, res){
 
 //create report
 app.get('/report/:quizz_id', function(req, res){
-    if(!req.user || req.banned) {
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
-    } else {
-        Report.getReport(req.params.quizz_id, req.user._id, function(err, report) {
-            if(!report) {
-                var newReport = new Report({
-                    user_id: req.user._id,
-                    quizz_id: req.params.quizz_id,
-                })
+    const id = req.user ? req.user._id : "0";
+    Report.getReport(req.params.quizz_id, id, function(err, report) {
+        if(!report) {
+            var newReport = new Report({
+                user_id: id,
+                quizz_id: req.params.quizz_id,
+            })
 
-                Report.createReport(newReport, function (err, report) {
-                    if (err){
-                        res.status(500).send(err).end();
-                    } else {
-                        res.send(report).end()
-                    }
-                });
-            } else {
-                res.status(500).send("{errors: \"Déjà signalé\"}").end()
-            }
-        })
-
-
-    }
-
+            Report.createReport(newReport, function (err, report) {
+                if (err){
+                    res.status(500).send(err).end();
+                } else {
+                    res.send(report).end()
+                }
+            });
+        } else {
+            res.status(500).send({message: "Quizz Déjà signalé"}).end()
+        }
+    })
 });
 
 
@@ -367,7 +361,7 @@ app.post('/login',
 // Endpoint to get current user
 app.get('/user', function(req, res){
     if(!req.user || req.banned) {
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
     }
         res.send(req.user);
 })
@@ -381,7 +375,7 @@ app.get('/logout', function(req, res){
 
 app.post('/update', function(req, res){
     if(!req.user || req.banned){
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
     }
    // console.log(req.user);
     User.updateUser(req, function(err, user){
@@ -396,7 +390,7 @@ app.post('/update', function(req, res){
 
 app.get('/username/:username', function(req,res) {
     if(!req.user || req.banned) {
-        res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
     } else {
         User.getUserByUsername(req.params.username, function (err, user) {
             if (err) {
@@ -414,7 +408,6 @@ app.get('/username/:username', function(req,res) {
 });
 
 app.get('/user/:id', function(req, res) {
-    console.log('entré');
     User.getUserById(req.params.id, function(err, user) {
         Quizz.getMyQuizz(user._id, false, function(err, quizz) {
             Answer.getAnswerAllByUserId(user._id, function(err, answers){
