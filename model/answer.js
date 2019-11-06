@@ -90,6 +90,10 @@ module.exports.getAnswerByUserId = function(user_id, quizz_id, callback) {
     Answer.findOne({user_id, quizz_id}).exec(callback);
 };
 
+module.exports.getAnswerAllByUserId = function(user_id, callback) {
+    Answer.find({user_id, deleted: false}).exec(callback);
+};
+
 
 module.exports.getAnswerByQuizz = function(quizz_id, callback) {
     Answer.find({quizz_id, deleted: false}).sort({createdAt: -1}).exec(callback);

@@ -133,7 +133,7 @@ app.get('/quizzs/:id', function(req, res) {
     if(!req.user || req.banned) {
         res.status(401).send("{errors: \"Vous n'êtes pas connecté\"}").end()
     } else {
-        Quizz.getMyQuizz(req.params.id, function (err, quizzs) {
+        Quizz.getMyQuizz(req.params.id, true, function (err, quizzs) {
             if (err) {
                 res.status(404).send("{errors: \"Ce quizz n'existe pas\"}").end()
             } else {
@@ -408,11 +408,21 @@ app.get('/username/:username', function(req,res) {
                 } else{
                     res.send(user).end();
                 }
-
             }
         })
     }
 });
+
+app.get('/user/:id', function(req, res) {
+    console.log('entré');
+    User.getUserById(req.params.id, function(err, user) {
+        Quizz.getMyQuizz(user._id, false, function(err, quizz) {
+            Answer.getAnswerAllByUserId(user._id, function(err, answers){
+                    res.send({user: {user_id: user._id, username: user.username}, quizz, answers}).end();
+                }, (err) =>  res.status(500).send(err).end());
+        }, (err) => res.status(500).send(err).end())
+    }, (err) => res.status(404).send(err).end())
+})
 
 
 var FacebookStrategy = require('passport-facebook').Strategy;
@@ -586,7 +596,6 @@ app.get('/admin/allUsers', function(req,res) {
              })
             console.log(html);
             res.end(html)
-            // res.send(user).end();
         }
     })
 });

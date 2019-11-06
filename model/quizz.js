@@ -94,8 +94,13 @@ module.exports.getAll = function(user_id, callback) {
 module.exports.getAllQuizz = function(callback) {
     Quizz.find().sort({date: 'desc'}).exec(callback);
 };
-module.exports.getMyQuizz = function(id, callback) {
-    Quizz.find({user_id: id}).sort({createdAt: -1}).exec(callback);
+module.exports.getMyQuizz = function(id, priv, callback) {
+    if(priv) {
+        Quizz.find({user_id: id}).sort({createdAt: -1}).exec(callback);
+
+    } else {
+        Quizz.find({user_id: id, private: false}).sort({createdAt: -1}).exec(callback);
+    }
 };
 
 module.exports.addAnswer = function(quizz_id, callback) {
