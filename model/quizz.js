@@ -73,6 +73,9 @@ var QuizzSchema = mongoose.Schema({
     deleted: {
         type: Boolean,
         default: false,
+    },
+    shortUrl: {
+        type: String,
     }
 });
 
