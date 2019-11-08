@@ -481,7 +481,7 @@ app.get('/auth/facebook',
     passport.authenticate('facebook'));
 
 app.get('/auth/facebook/callback',
-    passport.authenticate('facebook', { failureRedirect: '/login' }),
+    passport.authenticate('facebook', { failureRedirect: urlFront }),
     function(req, res) {
         // Successful authentication, redirect home.
         console.log(req.user);
@@ -535,7 +535,7 @@ app.get('/auth/twitter',
     passport.authenticate('twitter'));
 
 app.get('/auth/twitter/callback',
-    passport.authenticate('twitter', { failureRedirect: '/login' }),
+    passport.authenticate('twitter', { failureRedirect: urlFront }),
     function(req, res) {
         // Successful authentication, redirect home.
         console.log(req.user);
@@ -629,7 +629,7 @@ app.get('/auth/instagram',
     passport.authenticate('instagram'));
 
 app.get('/auth/instagram/callback',
-    passport.authenticate('instagram', { failureRedirect: '/login' }),
+    passport.authenticate('instagram', { failureRedirect: urlFront }),
     function(req, res) {
         // Successful authentication, redirect home.
         console.log(req.user);
