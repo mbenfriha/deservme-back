@@ -123,14 +123,16 @@ app.get('/quizz/:id', function(req, res) {
 app.get('/quizz', function(req, res) {
     if(!req.user || req.banned) {
         res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
-    }
-    Quizz.getAll(req.user._id,function (err, quizzs) {
-        if (err) {
-            res.status(500).send({message: "Une erreur est survenue"}).end()
+    } else {
+        Quizz.getAll(req.user._id,function (err, quizzs) {
+            if (err) {
+                res.status(500).send({message: "Une erreur est survenue"}).end()
 
-        }
-        res.send(quizzs).end()
-    })
+            }
+            res.send(quizzs).end()
+        })
+    }
+
 });
 
 app.get('/quizzs/:id', function(req, res) {
@@ -244,16 +246,17 @@ app.get('/answers/:id', function(req, res) {
 app.get('/answerUser/:quizz_id', function(req, res) {
     if(!req.user || req.banned) {
         res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
+    } else {
+        Answer.getAnswerByUserId(req.user._id, req.params.quizz_id, function (err, answer) {
+            if (err) {
+                res.status(500).send(err).end();
+            } else if (!answer) {
+                res.status(404).send(err).end();
+            } else {
+                res.send(answer).end()
+            }
+        })
     }
-    Answer.getAnswerByUserId(req.user._id, req.params.quizz_id, function (err, answer) {
-        if (err) {
-            res.status(500).send(err).end();
-        } else if(!answer) {
-            res.status(404).send(err).end();
-        } else {
-            res.send(answer).end()
-        }
-    })
 });
 
 // Register User
