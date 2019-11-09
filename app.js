@@ -426,11 +426,16 @@ app.get('/username/:username', function(req,res) {
 
 app.get('/user/:id', function(req, res) {
     User.getUserById(req.params.id, function(err, user) {
-        Quizz.getMyQuizz(user._id, false, function(err, quizz) {
-            Answer.getAnswerAllByUserId(user._id, function(err, answers){
+        if(user){
+            Quizz.getMyQuizz(user._id, false, function(err, quizz) {
+                Answer.getAnswerAllByUserId(user._id, function(err, answers){
                     res.send({user: {user_id: user._id, username: user.username}, quizz, answers}).end();
                 }, (err) =>  res.status(500).send(err).end());
-        }, (err) => res.status(500).send(err).end())
+            }, (err) => res.status(500).send(err).end())
+        } else {
+            res.status(404).send({message: "Cette utilisateur n'existe plus"}).end()
+        }
+
     }, (err) => res.status(404).send(err).end())
 })
 
