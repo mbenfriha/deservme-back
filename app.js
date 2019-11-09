@@ -189,9 +189,9 @@ app.post('/answer/create/:quizz_id', function(req, res){
                 questions: req.body.questions,
                 username: req.user.username,
                 title: req.body.title,
-                avatar: req.user.avatar,
+                avatar: req.body.avatar,
                 avatar_type: req.user.avatar_type,
-                registerd_user: true,
+                registered_user: true,
             })
 
         } else {
@@ -201,7 +201,7 @@ app.post('/answer/create/:quizz_id', function(req, res){
                 questions: req.body.questions,
                 username: req.body.username,
                 title: req.body.title,
-                registerd_user: false,
+                registered_user: false,
             })
         }
 
