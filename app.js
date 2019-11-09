@@ -7,6 +7,7 @@ var app      = express();
 var port     = process.env.PORT || 3000;
 const urlFront = process.env.FRONT || 'http://localhost:4200';
 const urlBack = process.env.BACK || 'http://localhost:3000/';
+const shortUrl = process.env.SHORTURL || 'http://localhost:4100/';
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var cors = require('cors');
@@ -15,8 +16,7 @@ var mongoose = require('mongoose');
 var passport = require('passport');
 const download = require('image-downloader');
 const url = require('url');
-
-
+const request = require('request');
 
 var User = require('./model/user');
 var Quizz = require('./model/quizz');
@@ -69,36 +69,43 @@ app.use(passport.session());
 app.post('/quizz/create', function(req, res){
     if(!req.user|| req.banned) {
         res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
-    }
-    console.log(req.body)
+    } else {
+        if(req.body.questions) {
+            if(req.body.questions.length > 19) {
+                res.status(401).send({message: "Un quizz ne peux comporter que 20 questions maximum"}).end()
+            } else {
+                var newQuizz = new Quizz({
+                    user_id: req.user._id,
+                    username: req.user.username,
+                    answer: false,
+                    title: req.body.title,
+                    questions: req.body.questions,
+                    avatar: req.user.avatar,
+                    avatar_type: req.user.avatar_type,
+                    private: req.body.private
+                })
 
-    if(req.body.questions) {
-        if(req.body.questions.length > 19) {
-            res.status(401).send({message: "Un quizz ne peux comporter que 20 questions maximum"}).end()
-        } else {
-            var newQuizz = new Quizz({
-                user_id: req.user._id,
-                username: req.user.username,
-                answer: false,
-                title: req.body.title,
-                questions: req.body.questions,
-                avatar: req.user.avatar,
-                avatar_type: req.user.avatar_type,
-                private: req.body.private
-            })
+                Quizz.createQuizz(newQuizz, function (err, quizz) {
+                    if (err) {
+                        res.status(500).send(err).end()
 
-            Quizz.createQuizz(newQuizz, function (err, quizz) {
-                if (err) {
-                    res.status(500).send(err).end()
+                    } else {
+                        request(shortUrl+'newQuizz/'+quizz._id, { json: true }, (err, response, body) => {
+                            if (err) { return console.log(err); }
+                            quizz.shortUrl = body.short_id;
+                            quizz.save();
+                            res.send(quizz).end();
+                        });
+                    }
+                });
+            }
 
-                }
-                res.send(quizz).end()
-            });
+        }else{
+            res.status(500).send({message: "Questions is empty"}).end()
         }
-
-    }else{
-        res.status(500).send({message: "Questions is empty"}).end()
     }
+
+
 });
 
 //get quizz by id
