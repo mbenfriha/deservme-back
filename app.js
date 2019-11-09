@@ -14,12 +14,21 @@ var session = require('express-session');
 var mongoose = require('mongoose');
 var passport = require('passport');
 const download = require('image-downloader');
+const url = require('url');
+
 
 
 var User = require('./model/user');
 var Quizz = require('./model/quizz');
 var Answer = require('./model/answer');
 var Report = require('./model/report');
+
+const storeRedirectToInSession = (req, res, next) => {
+    let url_parts = url.parse(req.get("referer"));
+    var redirectTo = url_parts.pathname;
+    req.session.redirectTo = redirectTo;
+    next();
+};
 
 
 console.log(urlBack);
@@ -368,7 +377,8 @@ app.post('/login',
 // Endpoint to get current user
 app.get('/user', function(req, res){
     if(!req.user || req.banned) {
-        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
+        req.session.redirectTo = '';
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end();
     }
         res.send(req.user);
 })
@@ -534,15 +544,16 @@ passport.use(new TwitterStrategy({
 );
 
 
-app.get('/auth/twitter',
+app.get('/auth/twitter',storeRedirectToInSession,
     passport.authenticate('twitter'));
 
 app.get('/auth/twitter/callback',
     passport.authenticate('twitter', { failureRedirect: urlFront }),
     function(req, res) {
+    console.log(req.session.redirectTo);
         // Successful authentication, redirect home.
         console.log(req.user);
-        res.redirect(urlFront+'?id='+req.user.twitter.id);
+        res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.twitter.id);
     }
 );
 
