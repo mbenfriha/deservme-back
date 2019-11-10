@@ -570,6 +570,7 @@ app.get('/auth/twitter/callback',
     }
 );
 
+
 InstagramStrategy = require("passport-instagram").Strategy;
 passport.use(new InstagramStrategy({
         clientID: "39c17946070a479abe4be0b18572cc09",
@@ -615,6 +616,78 @@ passport.use(new InstagramStrategy({
     }
 ));
 
+app.get('/auth/instagram',
+    passport.authenticate('instagram'));
+
+app.get('/auth/instagram/callback',
+    passport.authenticate('instagram', { failureRedirect: urlFront }),
+    function(req, res) {
+        // Successful authentication, redirect home.
+        console.log(req.user);
+        res.redirect(urlFront+'?id='+req.user.twitter.id);
+    }
+);
+
+
+GoogleStrategy = require('passport-google-oauth20').Strategy;
+passport.use(new GoogleStrategy({
+        clientID: "885652029797-j6lvuba4fb6cv8nciaqdb20q20ouc8ik.apps.googleusercontent.com",
+        clientSecret: "m-MO7TzxO1Z-MNCs5zU0fjQT",
+        callbackURL: urlBack+"auth/google/callback",
+        scope: 'profile'
+    },
+    function(accessToken, refreshToken, profile, done) {
+        User.findOne({ 'google.id' : profile.id }, function(err, user) {
+            if (err) return done(err);
+            if (user) return done(null, user);
+            else {
+                // if there is no user found with that facebook id, create them
+                var newUser = new User();
+
+                // set all of the facebook information in our user model
+                newUser.google.id = profile.id;
+                newUser.google.token = accessToken;
+                newUser.google.name  = profile.displayName;
+                newUser.avatar = profile.username;
+                newUser.avatar_type = 'google';
+
+
+
+                // save our user to the database
+                newUser.save(function(err, user) {
+                    if (err) throw err;
+                    // Download to a directory and save with an another filename
+                    options = {
+                        url: profile.photos[0].value,
+                        dest: __dirname+'/uploads/profile/'+user._id+'.jpg'      // Save to /path/to/dest/photo.jpg
+                    }
+
+                    download.image(options)
+                        .then(({ filename, image }) => {
+                        })
+                        .catch((err) => console.error(err));
+
+
+                    return done(null, newUser);
+                });
+            }
+        });
+    }
+));
+
+app.get('/auth/google',
+    passport.authenticate('google',{ scope: ['profile', 'email'] }));
+
+app.get('/auth/google/callback',
+    passport.authenticate('google', { failureRedirect: urlFront }),
+    function(req, res) {
+        // Successful authentication, redirect home.
+        console.log(req.user);
+        res.redirect(urlFront+'?id='+req.user.google.id);
+    }
+);
+
+
 
 // stats
 
@@ -648,17 +721,6 @@ app.get('/admin/allQuizz', function(req,res) {
     })
 });
 
-app.get('/auth/instagram',
-    passport.authenticate('instagram'));
-
-app.get('/auth/instagram/callback',
-    passport.authenticate('instagram', { failureRedirect: urlFront }),
-    function(req, res) {
-        // Successful authentication, redirect home.
-        console.log(req.user);
-        res.redirect(urlFront+'?id='+req.user.twitter.id);
-    }
-);
 
 
 app.use('/avatar', express.static(__dirname+'/uploads/profile'));
