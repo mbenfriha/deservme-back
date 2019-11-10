@@ -182,12 +182,13 @@ app.post('/answer/create/:quizz_id', function(req, res){
         })
     }
     if(req.body.questions) {
+        var questions = req.body.questions.filter(q => q.name);
         if(req.user) {
             var newAnswer = new Answer({
                 user_id: req.user._id,
                 quizz_id: req.params.quizz_id,
                 answer: true,
-                questions: req.body.questions,
+                questions: questions,
                 username: req.user.username,
                 title: req.body.title,
                 avatar: req.body.avatar,
@@ -199,7 +200,7 @@ app.post('/answer/create/:quizz_id', function(req, res){
             var newAnswer = new Answer({
                 quizz_id: req.params.quizz_id,
                 answer: true,
-                questions: req.body.questions,
+                questions: questions,
                 username: req.body.username,
                 title: req.body.title,
                 registered_user: false,
