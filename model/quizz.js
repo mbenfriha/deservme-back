@@ -91,7 +91,6 @@ module.exports.createQuizz = function(newQuizz, callback) {
 };
 
 module.exports.getQuizzById = function(id, callback) {
-    console.log(id);
     Quizz.findById(id).exec(callback);
 };
 module.exports.getAll = function(user_id, callback) {
@@ -111,9 +110,7 @@ module.exports.getMyQuizz = function(id, priv, callback) {
 };
 
 module.exports.addAnswer = function(quizz_id, callback) {
-    console.log(quizz_id, 'find_id');
     Quizz.findById(quizz_id, function(err, quizz) {
-        console.log(quizz);
         quizz.answer_count = quizz.answer_count+1;
         quizz.save(function(err) {
             callback(err, quizz);

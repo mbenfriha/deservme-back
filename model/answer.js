@@ -82,7 +82,6 @@ module.exports.createAnswer = function(newAnswer, callback) {
 };
 
 module.exports.getAnswerById = function(id, callback) {
-    console.log(id);
     Answer.findById(id).exec(callback);
 };
 

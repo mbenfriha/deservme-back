@@ -1,6 +1,5 @@
 if (process.env.NODE_ENV == 'production') {
     require('dotenv').config();
-    console.log('mode prod');
 }
 var express  = require('express');
 var app      = express();
@@ -31,7 +30,6 @@ const storeRedirectToInSession = (req, res, next) => {
 };
 
 
-console.log(urlBack);
 
 
 // Conenct to DB
@@ -182,7 +180,9 @@ app.post('/answer/create/:quizz_id', function(req, res){
         })
     }
     if(req.body.questions) {
+        console.log('qreq', req.body.questions);
         var questions = req.body.questions.filter(q => q.name);
+        console.log('filter', questions);
         if(req.user) {
             var newAnswer = new Answer({
                 user_id: req.user._id,
@@ -295,11 +295,9 @@ app.post('/register', function(req, res){
                 var error;
                 if (err.name == 'ValidationError') {
                     for (field in err.errors) {
-                        console.log(err.errors[field].message);
                     }
                     res.status(500).send(err.message).end();
                 } else {
-                    console.log(err);
                     res.status(500).send(err).end();
                 }
             } else {
@@ -487,7 +485,6 @@ passport.use(new FacebookStrategy({
                 newUser.facebook.name  = profile.displayName;
                 newUser.avatar = profile.id;
                 newUser.avatar_type = 'facebook';
-                console.log(profile._json.picture.data.url);
 
                 // save our user to the database
                 newUser.save(function(err, user) {
@@ -517,7 +514,6 @@ app.get('/auth/facebook/callback',
     passport.authenticate('facebook', { failureRedirect: urlFront }),
     function(req, res) {
         // Successful authentication, redirect home.
-        console.log(req.user);
         res.redirect(urlFront+'?id='+req.user.facebook.id);
     }
 );
@@ -552,7 +548,6 @@ passport.use(new TwitterStrategy({
 
                 download.image(options)
                     .then(({ filename, image }) => {
-                        console.log('Saved to', filename)  // Saved to /path/to/dest/photo.jpg
                     })
                     .catch((err) => console.error(err));
 
@@ -570,9 +565,7 @@ app.get('/auth/twitter',storeRedirectToInSession,
 app.get('/auth/twitter/callback',
     passport.authenticate('twitter', { failureRedirect: urlFront }),
     function(req, res) {
-    console.log(req.session.redirectTo);
         // Successful authentication, redirect home.
-        console.log(req.user);
         res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.twitter.id);
     }
 );
@@ -611,11 +604,9 @@ passport.use(new InstagramStrategy({
 
                     download.image(options)
                         .then(({ filename, image }) => {
-                            console.log('Saved to', filename)  // Saved to /path/to/dest/photo.jpg
                         })
                         .catch((err) => console.error(err));
 
-                    console.log(__dirname);
 
                     return done(null, newUser);
                 });
@@ -636,7 +627,6 @@ app.get('/admin/allUsers', function(req,res) {
              user.map(u => {
                  html += "<div>" + u.username + "</div>";
              })
-            console.log(html);
             res.end(html)
         }
     })
@@ -652,7 +642,6 @@ app.get('/admin/allQuizz', function(req,res) {
             quizz.map(q => {
                 html += "<div>" + q.title + "</div>";
             })
-            console.log(html);
             res.end(html)
             // res.send(user).end();
         }
