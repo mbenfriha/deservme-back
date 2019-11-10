@@ -74,6 +74,10 @@ var QuizzSchema = mongoose.Schema({
         type: Boolean,
         default: false,
     },
+    close: {
+        type: Boolean,
+        default: false,
+    },
     shortUrl: {
         type: String,
     }
@@ -121,6 +125,15 @@ module.exports.addAnswer = function(quizz_id, callback) {
 module.exports.changeState = function(quizz_id, callback) {
     Quizz.findById(quizz_id, function(err, quizz) {
         quizz.private = !quizz.private;
+        quizz.save(function(err) {
+            callback(err, quizz);
+        });
+    });
+}
+
+module.exports.closeQuizz = function(quizz_id, callback) {
+    Quizz.findById(quizz_id, function(err, quizz) {
+        quizz.close = !quizz.close;
         quizz.save(function(err) {
             callback(err, quizz);
         });

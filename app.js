@@ -82,7 +82,8 @@ app.post('/quizz/create', function(req, res){
                     questions: req.body.questions,
                     avatar: req.user.avatar,
                     avatar_type: req.user.avatar_type,
-                    private: req.body.private
+                    private: req.body.private,
+                    close: req.body.close
                 })
 
                 Quizz.createQuizz(newQuizz, function (err, quizz) {
@@ -448,6 +449,12 @@ app.get('/user/:id', function(req, res) {
 
 app.get('/changeQuizz/:id', function(req, res) {
     Quizz.changeState(req.params.id, function(err, quizz) {
+        res.send(quizz).end()
+    },(err) => res.status(500).send(err).end())
+});
+
+app.get('/closeQuizz/:id', function(req, res) {
+    Quizz.closeQuizz(req.params.id, function(err, quizz) {
         res.send(quizz).end()
     },(err) => res.status(500).send(err).end())
 });
