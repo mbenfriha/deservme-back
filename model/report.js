@@ -28,3 +28,9 @@ module.exports.createReport = function(newReport, callback) {
 module.exports.getReport = function(quizz_id, user_id, callback){
     Report.findOne({user_id, quizz_id}, callback);
 }
+
+
+module.exports.allReport = function(callback){
+    Report.find().exec(callback);
+}
+

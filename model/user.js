@@ -67,6 +67,10 @@ var UserSchema = mongoose.Schema({
     banned: {
         type: Boolean,
         default: false
+    },
+    role: {
+      type: String ,
+      default: "member",
     }
 });
 
@@ -84,7 +88,6 @@ module.exports.createUser = function(newUser, callback){
     });
 }
 module.exports.updateUser = function(updateUser, callback) {
-   // console.log(updateUser);
     let upd = updateUser.body;
     User.findOne(updateUser.user._id, function(err, user) {
         if(upd.username) {
@@ -130,5 +133,14 @@ module.exports.comparePassword = function(candidatePassword, hash, callback){
 
 module.exports.getAll = function(callback){
     User.find().exec(callback);
+}
+
+module.exports.ban = function(id, callback) {
+    User.findById(id, function(err, user) {
+        user.banned = !user.banned;
+        user.save(function (err) {
+            callback(err, user);
+        });
+    })
 }
 

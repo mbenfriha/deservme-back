@@ -4,9 +4,10 @@ if (process.env.NODE_ENV == 'production') {
 var express  = require('express');
 var app      = express();
 var port     = process.env.PORT || 3000;
-const urlFront = process.env.FRONT || 'http://localhost:4200';
+const urlFront = process.env.FRONT || 'http://localhost:4300';
 const urlBack = process.env.BACK || 'http://localhost:3000/';
 const shortUrl = process.env.SHORTURL || 'http://localhost:4100/';
+const admin = process.env.ADMIN || 'http://localhost:4200';
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var cors = require('cors');
@@ -44,7 +45,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 const corsOptions = {
-    origin: urlFront,
+    origin: [urlFront, admin],
     credentials: true,
 
 }
@@ -54,7 +55,7 @@ app.use(cors(corsOptions));
 
 // Express Session
 app.use(session({
-    secret: 'test',
+    secret: 'mu8rE*YY~J|bS36k72K>9{xjX*nGh$32MµT@8€3r',
     saveUninitialized: true,
     resave: true
 }));
@@ -565,8 +566,15 @@ app.get('/auth/twitter',storeRedirectToInSession,
 app.get('/auth/twitter/callback',
     passport.authenticate('twitter', { failureRedirect: urlFront }),
     function(req, res) {
+    console.log(req.session.redirectTo)
         // Successful authentication, redirect home.
-        res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.twitter.id);
+        if(req.session.redirectTo == '/login')
+            res.redirect(admin+req.session.redirectTo+'?id='+req.user.twitter.id);
+        else
+            res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.twitter.id);
+
+
+
     }
 );
 
@@ -693,33 +701,54 @@ app.get('/auth/google/callback',
 
 app.get('/admin/allUsers', function(req,res) {
 
-    User.getAll(function (err, user) {
-
-        if(user) {
-            var html = "<div>" + user.length + "</div>";
-             user.map(u => {
-                 html += "<div>" + u.username + "</div>";
-             })
-            res.end(html)
-        }
-    })
+    if(!req.user ||req.user.role !== 'admin') {
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
+    } else {
+        User.getAll(function (err, user) {
+            res.send(user).end();
+        })
+    }
 });
 
 
 app.get('/admin/allQuizz', function(req,res) {
-
-    Quizz.getAllQuizz(function (err, quizz) {
-
-        if(quizz) {
-            var html = "<div>" + quizz.length + "</div>";
-            quizz.map(q => {
-                html += "<div>" + q.title + "</div>";
-            })
-            res.end(html)
-            // res.send(user).end();
-        }
-    })
+    if(!req.user || req.user.role !== 'admin') {
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
+    } else {
+        Quizz.getAllQuizz(function (err, quizz) {
+            res.send(quizz).end();
+        })
+    }
 });
+
+app.get('/admin/banUser/:id', function(req, res) {
+    if(!req.user || req.user.role !== 'admin') {
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
+    } else {
+        User.ban(req.params.id, function (err, user) {
+            res.send(user).end();
+        })
+    }
+})
+app.get('/admin/deleteQuizz/:id', function(req, res) {
+    if(!req.user || req.user.role !== 'admin') {
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
+    } else {
+        Quizz.deleteQuizz(req.params.id, function (err, user) {
+            res.send(user).end();
+        })
+    }
+})
+
+app.get('/admin/reports', function(req, res) {
+    if(!req.user || req.user.role !== 'admin') {
+        res.status(401).send({message: "Vous n'êtes pas connecté"}).end()
+    } else {
+        Report.allReport(function (err, report) {
+            res.send(report).end();
+        })
+    }
+})
 
 
 
