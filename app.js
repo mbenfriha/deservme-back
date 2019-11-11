@@ -515,7 +515,11 @@ app.get('/auth/facebook/callback',
     passport.authenticate('facebook', { failureRedirect: urlFront }),
     function(req, res) {
         // Successful authentication, redirect home.
-        res.redirect(urlFront+'?id='+req.user.facebook.id);
+        if(req.session.redirectTo == '/login')
+            res.redirect(admin+req.session.redirectTo+'?id='+req.user.facebook.id);
+        else
+            res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.facebook.id);
+
     }
 );
 
@@ -631,8 +635,10 @@ app.get('/auth/instagram/callback',
     passport.authenticate('instagram', { failureRedirect: urlFront }),
     function(req, res) {
         // Successful authentication, redirect home.
-        console.log(req.user);
-        res.redirect(urlFront+'?id='+req.user.twitter.id);
+        if(req.session.redirectTo == '/login')
+            res.redirect(admin+req.session.redirectTo+'?id='+req.user.instagram.id);
+        else
+            res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.instagram.id);
     }
 );
 
@@ -690,8 +696,10 @@ app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: urlFront }),
     function(req, res) {
         // Successful authentication, redirect home.
-        console.log(req.user);
-        res.redirect(urlFront+'?id='+req.user.google.id);
+        if(req.session.redirectTo == '/login')
+            res.redirect(admin+req.session.redirectTo+'?id='+req.user.google.id);
+        else
+            res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.google.id);
     }
 );
 
