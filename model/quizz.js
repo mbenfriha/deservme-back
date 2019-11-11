@@ -98,7 +98,7 @@ module.exports.getAll = function(user_id, callback) {
 };
 
 module.exports.getAllQuizz = function(callback) {
-    Quizz.find().sort({date: 'desc'}).exec(callback);
+    Quizz.find().sort({createdAt: 'desc'}).exec(callback);
 };
 module.exports.getMyQuizz = function(id, priv, callback) {
     if(priv) {
@@ -140,7 +140,7 @@ module.exports.closeQuizz = function(quizz_id, callback) {
 
 module.exports.deleteQuizz = function(quizz_id, callback) {
     Quizz.findById(quizz_id, function(err, quizz) {
-        quizz.deleted = true;
+            quizz.deleted = true;
         quizz.save(function(err) {
             callback(err, quizz);
         });

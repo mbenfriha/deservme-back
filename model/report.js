@@ -2,11 +2,11 @@ var mongoose = require('mongoose');
 
 // report Schema
 var ReportSchema = mongoose.Schema({
-    quizz_id: {
-        type : String,
+    quizz: {
+        type : Object,
     },
-    user_id: {
-        type: String,
+    user: {
+        type: Object,
     },
     createdAt: {
         type: Date,
@@ -25,8 +25,8 @@ module.exports.createReport = function(newReport, callback) {
 };
 
 
-module.exports.getReport = function(quizz_id, user_id, callback){
-    Report.findOne({user_id, quizz_id}, callback);
+module.exports.getReport = function(quizz, user, callback){
+    Report.findOne({"user._id": user._id, "quizz._id": quizz._id}, callback);
 }
 
 

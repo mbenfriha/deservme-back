@@ -314,25 +314,32 @@ app.post('/register', function(req, res){
 
 //create report
 app.get('/report/:quizz_id', function(req, res){
-    const id = req.user ? req.user._id : "0";
-    Report.getReport(req.params.quizz_id, id, function(err, report) {
-        if(!report) {
-            var newReport = new Report({
-                user_id: id,
-                quizz_id: req.params.quizz_id,
-            })
+    const user = req.user ? req.user: {_id: '0'};
 
-            Report.createReport(newReport, function (err, report) {
-                if (err){
-                    res.status(500).send(err).end();
-                } else {
-                    res.send(report).end()
-                }
-            });
-        } else {
-            res.status(500).send({message: "Quizz Déjà signalé"}).end()
-        }
+    Quizz.getQuizzById(req.params.quizz_id, function(err, quizz) {
+        Report.getReport(quizz, user, function(err, report) {
+            if(!report) {
+                var newReport = new Report({
+                    user: user,
+                    quizz: quizz,
+                })
+
+                Report.createReport(newReport, function (err, report) {
+                    if (err){
+                        res.status(500).send(err).end();
+                    } else {
+                        res.send(report).end()
+                    }
+                });
+            } else {
+                res.status(500).send({message: "Quizz Déjà signalé"}).end()
+            }
+        })
+    }, err => {
+        res.status(500).send({message: "Ce quizz n'existe pas"}).end()
     })
+
+
 });
 
 
@@ -711,6 +718,8 @@ app.get('/admin/allUsers', function(req,res) {
     } else {
         User.getAll(function (err, user) {
             res.send(user).end();
+        }, err => {
+            res.status(500).send({message: "Une erreur est survenue"}).end()
         })
     }
 });
@@ -722,6 +731,8 @@ app.get('/admin/allQuizz', function(req,res) {
     } else {
         Quizz.getAllQuizz(function (err, quizz) {
             res.send(quizz).end();
+        }, err => {
+            res.status(500).send({message: "Une erreur est survenue"}).end()
         })
     }
 });
@@ -732,6 +743,8 @@ app.get('/admin/banUser/:id', function(req, res) {
     } else {
         User.ban(req.params.id, function (err, user) {
             res.send(user).end();
+        }, err => {
+            res.status(500).send({message: "Une erreur est survenue"}).end()
         })
     }
 })
@@ -741,6 +754,8 @@ app.get('/admin/deleteQuizz/:id', function(req, res) {
     } else {
         Quizz.deleteQuizz(req.params.id, function (err, user) {
             res.send(user).end();
+        }, err => {
+            res.status(500).send({message: "Une erreur est survenue"}).end()
         })
     }
 })
@@ -751,6 +766,8 @@ app.get('/admin/reports', function(req, res) {
     } else {
         Report.allReport(function (err, report) {
             res.send(report).end();
+        }, err => {
+            res.status(500).send({message: "Une erreur est survenue"}).end()
         })
     }
 })
