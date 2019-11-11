@@ -514,7 +514,7 @@ app.get('/auth/facebook',
 app.get('/auth/facebook/callback',
     passport.authenticate('facebook', { failureRedirect: urlFront }),
     function(req, res) {
-        res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.twitter.id);
+        res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.facebook.id);
 
     }
 );
@@ -623,7 +623,7 @@ app.get('/auth/instagram/callback',
     passport.authenticate('instagram', { failureRedirect: urlFront }),
     function(req, res) {
         // Successful authentication, redirect home.
-        res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.twitter.id);
+        res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.instagram.id);
 
     }
 );
@@ -682,7 +682,7 @@ app.get('/auth/google/callback',
     passport.authenticate('google', { failureRedirect: urlFront }),
     function(req, res) {
         // Successful authentication, redirect home.
-        res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.twitter.id);
+        res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.google.id);
 
     }
 );
