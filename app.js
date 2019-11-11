@@ -46,9 +46,19 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 const corsOptions = {
-    origin: [urlAdmin, urlFront],
+    origin: function (origin, callback) {
+        if (whitelist.indexOf(origin) !== -1) {
+            callback(null, true);
+        } else if(!origin) {
+            callback(null, true);
+        } else {
+            console.log(origin);
+            callback(new Error('Not allowed by CORS', origin))
+        }
+    },
     credentials: true,
-}
+
+};
 
 app.use(cors(corsOptions));
 
