@@ -48,11 +48,12 @@ app.use(cookieParser());
 const corsOptions = {
     origin: function (origin, callback) {
         console.log(origin, urlAdmin);
-        if (whitelist.indexOf(origin) !== -1) {
+        if (origin == urlAdmin) {
+            console.log('admin');
             callback(null, true);
         } else if(!origin) {
             callback(null, true);
-        } else if(origin == urlAdmin) {
+        } else if(whitelist.indexOf(origin) !== -1) {
             console.log('admin');
             callback(null, true);
         } else {
