@@ -47,12 +47,12 @@ app.use(cookieParser());
 
 const corsOptions = {
     origin: function (origin, callback) {
+        console.log(origin);
         if (whitelist.indexOf(origin) !== -1) {
             callback(null, true);
         } else if(!origin) {
             callback(null, true);
         } else {
-            console.log(origin);
             callback(new Error('Not allowed by CORS', origin))
         }
     },
@@ -191,9 +191,7 @@ app.post('/answer/create/:quizz_id', function(req, res){
         })
     }
     if(req.body.questions) {
-        console.log('qreq', req.body.questions);
         var questions = req.body.questions.filter(q => q.name);
-        console.log('filter', questions);
         if(req.user) {
             var newAnswer = new Answer({
                 user_id: req.user._id,

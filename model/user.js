@@ -132,7 +132,8 @@ module.exports.comparePassword = function(candidatePassword, hash, callback){
 }
 
 module.exports.getAll = function(callback){
-    User.find().exec(callback);
+    User.find().sort({createdAt: 'desc'}).exec(callback);
+
 }
 
 module.exports.ban = function(id, callback) {
