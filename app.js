@@ -47,12 +47,13 @@ app.use(cookieParser());
 
 const corsOptions = {
     origin: function (origin, callback) {
-        console.log(origin);
+        console.log(origin, urlAdmin);
         if (whitelist.indexOf(origin) !== -1) {
             callback(null, true);
         } else if(!origin) {
             callback(null, true);
         } else if(origin == urlAdmin) {
+            console.log('admin');
             callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS', origin))
