@@ -7,7 +7,7 @@ var port     = process.env.PORT || 3000;
 const urlFront = process.env.FRONT || 'http://localhost:4300';
 const urlBack = process.env.BACK || 'http://localhost:3000/';
 const shortUrl = process.env.SHORTURL || 'http://localhost:4100/';
-const admin = process.env.ADMIN || 'http://localhost:4200';
+const urlAdmin = process.env.ADMIN || 'http://localhost:4200';
 var bodyParser = require('body-parser');
 var cookieParser = require('cookie-parser');
 var cors = require('cors');
@@ -45,7 +45,7 @@ app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
 
 const corsOptions = {
-    origin: [urlFront, admin],
+    origin: [urlFront, urlAdmin],
     credentials: true,
 
 }
