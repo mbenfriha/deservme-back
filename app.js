@@ -52,6 +52,8 @@ const corsOptions = {
             callback(null, true);
         } else if(!origin) {
             callback(null, true);
+        } else if(origin == urlAdmin) {
+            callback(null, true);
         } else {
             callback(new Error('Not allowed by CORS', origin))
         }
