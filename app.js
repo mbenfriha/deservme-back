@@ -514,14 +514,7 @@ app.get('/auth/facebook',
 app.get('/auth/facebook/callback',
     passport.authenticate('facebook', { failureRedirect: urlFront }),
     function(req, res) {
-        console.log(req.session.redirectTo)
-
-        // Successful authentication, redirect home.
-        if(req.session.redirectTo == '/login')
-            res.redirect(admin+req.session.redirectTo+'?id='+req.user.facebook.id);
-        else
-            res.redirect(urlFront+req.session.redirectTo+'?id='+req.user.facebook.id);
-
+        res.redirect(urlFront+'?id='+req.user.facebook.id);
     }
 );
 
