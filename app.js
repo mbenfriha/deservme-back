@@ -66,7 +66,8 @@ app.use(cors(corsOptions));
 app.use(session({
     secret: 'mu8rE*YY~J|bS36k72K>9{xjX*nGh$32MµT@8€3r',
     saveUninitialized: true,
-    resave: true
+    resave: true,
+    cookie: { maxAge : 3600000 }
 }));
 
 // Passport init
