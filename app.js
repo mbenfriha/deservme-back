@@ -30,8 +30,18 @@ const storeRedirectToInSession = (req, res, next) => {
     next();
 };
 
+var whitelist = [urlFront, urlAdmin];
 
 
+var corsOptionsDelegate = function (req, callback) {
+    var corsOptions;
+    if (whitelist.indexOf(req.header('Origin')) !== -1) {
+        corsOptions = { origin: true, credentials: true, } // reflect (enable) the requested origin in the CORS response
+    } else {
+        corsOptions = { origin: false, credentials: true, } // disable CORS for this request
+    }
+    callback(null, corsOptions) // callback expects two parameters: error and options
+}
 
 // Conenct to DB
 mongoose.connect('mongodb://localhost/deservme');
@@ -43,14 +53,14 @@ var db = mongoose.connection;
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(cookieParser());
-
+/*
 const corsOptions = {
     origin: [urlFront, urlAdmin],
     credentials: true,
 
-}
+}*/
 
-app.use(cors(corsOptions));
+app.use(cors(corsOptionsDelegate));
 
 
 // Express Session
