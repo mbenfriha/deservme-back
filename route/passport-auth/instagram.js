@@ -55,8 +55,8 @@ module.exports.auth = function(req, res) {
     }, config.secretOrKey, { expiresIn: '24h' }); // expiry in seconds
     res.cookie('jwt', token);
     if(req.session.redirectTo) {
-        res.redirect(urlFront + req.session.redirectTo + '?id=' + req.user.instagram.id);
+        res.redirect(urlFront + req.session.redirectTo );
     } else {
-        res.redirect(urlFront + '?id=' + req.user.instagram.id);
+        res.redirect(urlFront);
     }
 };

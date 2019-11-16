@@ -58,9 +58,9 @@ module.exports.auth = function(req, res) {
     console.log(token);
 
     if(req.session.redirectTo) {
-        res.redirect(urlFront + req.session.redirectTo + '?id=' + req.user.google.id);
+        res.redirect(urlFront + req.session.redirectTo );
     }
     else {
-        res.redirect(urlFront + '?id=' + req.user.google.id);
+        res.redirect(urlFront);
     }
 };
