@@ -1,14 +1,11 @@
 var mongoose = require('mongoose');
 
-
-
-
 var ChoiceSchema = mongoose.Schema({
     name: {
         type: String,
         validate: {
             validator: function(v) {
-                return v.length <= 40
+                return v.length <= 90
             },
             message: 'Réponse trop longue '
         }
@@ -100,13 +97,11 @@ module.exports.getAll = function(user_id, callback) {
 module.exports.getAllQuizz = function(callback) {
     Quizz.find().sort({createdAt: 'desc'}).exec(callback);
 };
-module.exports.getMyQuizz = function(id, priv, callback) {
-    if(priv) {
-        Quizz.find({user_id: id, deleted: false}).sort({createdAt: -1}).exec(callback);
-
-    } else {
+module.exports.getUserQuizz = function(id, priv, callback) {
         Quizz.find({user_id: id, private: false,  deleted: false}).sort({createdAt: -1}).exec(callback);
-    }
+};
+module.exports.getMyQuizz = function(id, priv, callback) {
+        Quizz.find({user_id: id, deleted: false}).sort({createdAt: -1}).exec(callback);
 };
 
 module.exports.addAnswer = function(quizz_id, callback) {
