@@ -55,6 +55,8 @@ module.exports.auth = function(req, res) {
     }, config.secretOrKey, { expiresIn: '24h' }); // expiry in seconds
     res.cookie('jwt', token);
 
+    console.log(token);
+
     if(req.session.redirectTo) {
         res.redirect(urlFront + req.session.redirectTo + '?id=' + req.user.google.id);
     }
