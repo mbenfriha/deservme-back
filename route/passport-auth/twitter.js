@@ -48,10 +48,11 @@ module.exports.auth = function(req, res) {
     let token = jwt.sign({
         data: req.user
     }, config.secretOrKey, { expiresIn: '24h' }); // expiry in seconds
-    res.cookie('jwt', token);
+    res.cookie('jwt', token, {domain:'.myquizzy.com'});
+
     if(req.session.redirectTo) {
         res.redirect(urlFront + req.session.redirectTo );
     } else {
-        res.redirect(urlFront );
+        res.redirect(urlFront);
     }
 };

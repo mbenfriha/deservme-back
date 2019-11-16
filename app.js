@@ -79,6 +79,12 @@ app.use(session({
     resave: true,
     cookie: { maxAge : 24 * 60 * 60 * 1000 }
 }));
+app.use(session({
+    secret: 'mu8rE*YY~J|bS36k72K>9{xjX*nGh$32MµT@8€3r',
+    saveUninitialized: true,
+    resave: true,
+    cookie: { maxAge : 24 * 60 * 60 * 1000}
+}));
 
 // Passport init
 app.use(passport.initialize());
