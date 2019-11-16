@@ -48,7 +48,7 @@ module.exports.auth = function(req, res) {
     let token = jwt.sign({
         data: req.user
     }, config.secretOrKey, { expiresIn: '24h' }); // expiry in seconds
-    res.cookie('jwt', token, { domain: urlFront, path: '/', expires: new Date(Date.now() + 9000000), httpOnly: false });
+    res.cookie('jwt', token);
     if(req.session.redirectTo) {
         res.redirect(urlFront + req.session.redirectTo );
     } else {
