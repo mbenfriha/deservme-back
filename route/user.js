@@ -1,15 +1,12 @@
 var User = require('../model/user');
 var Quizz = require('../model/quizz');
 var Answer = require('../model/answer');
-const passport = require('passport');
+multer = require('multer');
+const fileUpload = require('express-fileupload');
 
 
-module.exports.login = function(req, res) {
-    passport.authenticate('local'),
-        function(req, res) {
-            res.send(req.user);
-        }
-};
+// File upload settings
+const PATH = __dirname + '/../uploads/profile';
 
 module.exports.register = function(req, res) {
     var password = req.body.password;
@@ -58,13 +55,40 @@ module.exports.current = function(req, res) {
 };
 
 module.exports.update = function(req, res) {
-    User.updateUser(req, function(err, user){
+    User.updateUser(req, function(user, err){
         if(err){
             res.status(500).send(err).end();
         } else {
+            delete user.password;
             res.send(user).end();
         }
     })
+};
+module.exports.updateAvatar = function(req, res) {
+    console.log(__dirname + '/../uploads/profile/' + req.user._id + '.jpg');
+    try {
+        if(!req.files) {
+            res.status(404).send({status: false, message: 'fichier manquant'}).end();
+        } else {
+            let avatar = req.files.file;
+            console.log(__dirname + '/../uploads/profile/' + req.user._id + '.jpg');
+            //Use the mv() method to place the file in upload directory (i.e. "uploads")
+            avatar.mv(__dirname + '/../uploads/profile/' + req.user._id + '.jpg');
+
+            //send response
+            res.send({
+                status: true,
+                message: 'File is uploaded',
+                data: {
+                    name: avatar.name,
+                    mimetype: avatar.mimetype,
+                    size: avatar.size
+                }
+            });
+        }
+    } catch (err) {
+        res.status(500).send(err);
+    }
 };
 
 module.exports.getUsername = function(req, res) {

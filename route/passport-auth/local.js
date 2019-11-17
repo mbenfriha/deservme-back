@@ -1,21 +1,18 @@
 const passport = require('passport');
-const download = require('image-downloader');
-const jwt = require('jsonwebtoken');
 const config = {secretOrKey:"-=&s%j6m@4m-kAt$PFwaC4Vt2WXE@-8_xe", jwt:'V?EqJ*geF?cYm^%5A=GkzwP&M#!PhEb4UN'};
+const jwt = require('jsonwebtoken');
+
 
 var User = require('../../model/user');
 
 
-const urlFront = process.env.FRONT || 'http://localhost:4300';
-const urlBack = process.env.BACK || 'http://localhost:3000/';
-
-
-var LocalStrategy = require('passport-local').Strategy;
+LocalStrategy = require('passport-local').Strategy;
 passport.use(new LocalStrategy({
         usernameField: 'email',
         passwordField: 'password'
     },
     function(username, password, done) {
+    console.log(username, password);
         User.findOne({ email: username }, function(err, user){
             if(err) {
                 res.status(500).send(err).end();
@@ -28,7 +25,14 @@ passport.use(new LocalStrategy({
                     res.status(500).send(err).end();
                 };
                 if(isMatch){
-                    return done(null, user);
+                    const us = user;
+                    delete us.password;
+                    let token = jwt.sign({
+                        data: user
+                    }, config.secretOrKey, { expiresIn: '24h' }); // expiry in seconds
+
+                    us.token = token;
+                    return done(null, us);
                 } else {
                     return done(null, false, {message: 'Invalid password'});
                 }
@@ -36,3 +40,12 @@ passport.use(new LocalStrategy({
         });
     }
 ));
+
+module.exports.auth = function(req, res) {
+
+    let token = jwt.sign({
+        data: req.user
+    }, config.secretOrKey, { expiresIn: '24h' }); // expiry in seconds
+
+    res.send({jwt:token});
+};

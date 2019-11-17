@@ -98,6 +98,7 @@ module.exports.updateUser = function(updateUser, callback) {
             user.email = upd.newEmail;
         }
         if(upd.password) {
+            console.log(upd.password);
             bcrypt.genSalt(10, function(err, salt) {
                 bcrypt.hash(upd.password, salt, function(err, hash) {
                     user.password = hash;
@@ -107,8 +108,9 @@ module.exports.updateUser = function(updateUser, callback) {
                 });
             });
         } else {
+
             user.save(function(err) {
-                callback(err, user);
+                callback(user, err);
             });
         }
 

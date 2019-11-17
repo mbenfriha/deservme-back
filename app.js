@@ -14,6 +14,8 @@ const download = require('image-downloader');
 const url = require('url');
 const jwt = require('jsonwebtoken');
 const config = {secretOrKey:"-=&s%j6m@4m-kAt$PFwaC4Vt2WXE@-8_xe", jwt:'V?EqJ*geF?cYm^%5A=GkzwP&M#!PhEb4UN'};
+const fileUpload = require('express-fileupload');
+
 
 
 const port     = process.env.PORT || 3000;
@@ -33,6 +35,7 @@ const PassportTwitter = require('./route/passport-auth/twitter');
 const PassportFacebook = require('./route/passport-auth/facebook');
 const PassportGoogle = require('./route/passport-auth/google');
 const PassportInstagram = require('./route/passport-auth/instagram');
+const PassportLocal = require('./route/passport-auth/local');
 
 
 // Get previous url before login
@@ -71,6 +74,10 @@ const corsOptions = {
 };
 
 app.use(cors(corsOptions));
+
+app.use(fileUpload({
+    createParentPath: true
+}));
 
 // Express Session
 app.use(session({
@@ -171,7 +178,7 @@ app.get('/answerUser/:quizz_id', passport.authenticate('jwt', { session: false }
 app.post('/register', User.register);
 
 // login user
-app.post('/login', User.login);
+app.post('/login', passport.authenticate('local'), PassportLocal.auth);
 
 
 // get current user
@@ -192,6 +199,8 @@ app.get('/username/:username', User.getUsername);
 
 // get single user
 app.get('/user/:id', User.get);
+
+app.post('/user/avatar', passport.authenticate('jwt', { session: false }), User.updateAvatar);
 
 
 
