@@ -12,7 +12,6 @@ passport.use(new LocalStrategy({
         passwordField: 'password'
     },
     function(username, password, done) {
-    console.log(username, password);
         User.findOne({ email: username }, function(err, user){
             if(err) {
                 res.status(500).send(err).end();
