@@ -24,14 +24,7 @@ passport.use(new LocalStrategy({
                     res.status(500).send(err).end();
                 };
                 if(isMatch){
-                    const us = user;
-                    delete us.password;
-                    let token = jwt.sign({
-                        data: user
-                    }, config.secretOrKey, { expiresIn: '24h' }); // expiry in seconds
-
-                    us.token = token;
-                    return done(null, us);
+                    return done(null, user);
                 } else {
                     return done(null, false, {message: 'Invalid password'});
                 }
