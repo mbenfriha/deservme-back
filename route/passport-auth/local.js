@@ -45,7 +45,7 @@ module.exports.auth = function(req, res) {
 
     let token = jwt.sign({
         data: req.user
-    }, config.secretOrKey, { expiresIn: '24h' }); // expiry in seconds
+    }, config.secretOrKey, { expiresIn: '148h' }); // expiry in seconds
 
     res.send({jwt:token});
 };
