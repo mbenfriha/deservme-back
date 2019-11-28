@@ -91,11 +91,11 @@ module.exports.getQuizzById = function(id, callback) {
     Quizz.findById(id).exec(callback);
 };
 module.exports.getAll = function(user_id, callback) {
-    Quizz.find({user_id: {$ne: user_id}, private: false, deleted: false, createdAt: { $gte: new Date((new Date().getTime() - (7 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(20).exec(callback);
+    Quizz.find({user_id: {$ne: user_id}, private: false, deleted: false, createdAt: { $gte: new Date((new Date().getTime() - (30 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(20).exec(callback);
 };
 
 module.exports.getRand = function(callback) {
-    Quizz.find({private: false, deleted: false, createdAt: { $gte: new Date((new Date().getTime() - (7 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(10).exec(callback);
+    Quizz.find({private: false, deleted: false, createdAt: { $gte: new Date((new Date().getTime() - (30 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(10).exec(callback);
 };
 
 module.exports.getAllQuizz = function(callback) {
