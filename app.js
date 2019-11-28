@@ -19,7 +19,7 @@ const fileUpload = require('express-fileupload');
 
 
 const port     = process.env.PORT || 3000;
-const urlFront = process.env.FRONT || 'http://localhost:4300';
+const urlFront = process.env.FRONT || 'http://localhost:4000';
 const urlBack = process.env.BACK || 'http://localhost:3000/';
 const urlAdmin = process.env.ADMIN || 'http://localhost:4200';
 
@@ -123,11 +123,16 @@ function CheckUser(profil) {
 //create quizz
 app.post('/quizz/create', passport.authenticate('jwt', { session: false }), Quizz.create);
 
+//get all rand
+app.get('/quizz/rand', Quizz.getAllRand);
+
 //get quizz by id
 app.get('/quizz/:id', Quizz.getSingle);
 
 //get all quizz
 app.get('/quizz', passport.authenticate('jwt', { session: false }), Quizz.getAll);
+
+
 
 //get all quizz of user
 app.get('/quizz/user/:id', Quizz.getAllByUser);

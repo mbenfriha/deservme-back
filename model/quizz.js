@@ -36,7 +36,7 @@ var QuizzSchema = mongoose.Schema({
         type: String,
     },
     title: {
-       type: String,
+        type: String,
         validate: {
             validator: function(v) {
                 return v.length <= 50
@@ -94,14 +94,18 @@ module.exports.getAll = function(user_id, callback) {
     Quizz.find({user_id: {$ne: user_id}, private: false, deleted: false, createdAt: { $gte: new Date((new Date().getTime() - (7 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(20).exec(callback);
 };
 
+module.exports.getRand = function(callback) {
+    Quizz.find({private: false, deleted: false, createdAt: { $gte: new Date((new Date().getTime() - (7 * 24 * 60 * 60 * 1000))) }} ).sort({answer_count: 'desc'}).limit(10).exec(callback);
+};
+
 module.exports.getAllQuizz = function(callback) {
     Quizz.find().sort({createdAt: 'desc'}).exec(callback);
 };
 module.exports.getUserQuizz = function(id, priv, callback) {
-        Quizz.find({user_id: id, private: false,  deleted: false}).sort({createdAt: -1}).exec(callback);
+    Quizz.find({user_id: id, private: false,  deleted: false}).sort({createdAt: -1}).exec(callback);
 };
 module.exports.getMyQuizz = function(id, priv, callback) {
-        Quizz.find({user_id: id, deleted: false}).sort({createdAt: -1}).exec(callback);
+    Quizz.find({user_id: id, deleted: false}).sort({createdAt: -1}).exec(callback);
 };
 
 module.exports.addAnswer = function(quizz_id, callback) {
@@ -112,7 +116,6 @@ module.exports.addAnswer = function(quizz_id, callback) {
         });
     });
 }
-
 
 module.exports.changeState = function(quizz_id, callback) {
     Quizz.findById(quizz_id, function(err, quizz) {
@@ -135,7 +138,7 @@ module.exports.closeQuizz = function(quizz_id, callback) {
 
 module.exports.deleteQuizz = function(quizz_id, callback) {
     Quizz.findById(quizz_id, function(err, quizz) {
-            quizz.deleted = true;
+        quizz.deleted = true;
         quizz.save(function(err) {
             callback(err, quizz);
         });

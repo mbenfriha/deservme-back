@@ -12,6 +12,15 @@ module.exports.getAll = function(req, res) {
         res.send(quizzs).end()
     })
 };
+
+module.exports.getAllRand = function(req, res) {
+    Quizz.getRand(function (err, quizzs) {
+        if (err) {
+            res.status(500).send({message: "Une erreur est survenue"}).end()
+        }
+        res.send(quizzs).end()
+    })
+};
 module.exports.getAllByUser = function(req, res) {
     Quizz.getMyQuizz(req.params.id, true, function (err, quizzs) {
         if (err) {
@@ -27,6 +36,7 @@ module.exports.getAllByUser = function(req, res) {
     })
 };
 module.exports.getSingle = function(req, res) {
+    console.log('getSingle');
     Quizz.getQuizzById(req.params.id, function (err, quizz) {
         if (err) {
             res.status(404).send({message: "Ce quizz n'existe pas"}).end()
@@ -37,6 +47,7 @@ module.exports.getSingle = function(req, res) {
                 if(quizz.deleted) {
                     res.status(404).send({message: "Ce quizz n'existe pas"}).end()
                 } else {
+                    console.log('caca', JSON.stringify(quizz));
                     res.send(quizz).end()
                 }
             }
@@ -44,39 +55,39 @@ module.exports.getSingle = function(req, res) {
     })
 };
 module.exports.create = function(req, res) {
-        if(req.body.questions) {
-            if(req.body.questions.length > 19) {
-                res.status(401).send({message: "Un quizz ne peux comporter que 20 questions maximum"}).end()
-            } else {
-                var newQuizz = new Quizz({
-                    user_id: req.user._id,
-                    username: req.user.username,
-                    answer: false,
-                    title: req.body.title,
-                    questions: req.body.questions,
-                    avatar: req.user.avatar,
-                    avatar_type: req.user.avatar_type,
-                    private: req.body.private,
-                    close: req.body.close
-                })
+    if(req.body.questions) {
+        if(req.body.questions.length > 19) {
+            res.status(401).send({message: "Un quizz ne peux comporter que 20 questions maximum"}).end()
+        } else {
+            var newQuizz = new Quizz({
+                user_id: req.user._id,
+                username: req.user.username,
+                answer: false,
+                title: req.body.title,
+                questions: req.body.questions,
+                avatar: req.user.avatar,
+                avatar_type: req.user.avatar_type,
+                private: req.body.private,
+                close: req.body.close
+            })
 
-                Quizz.createQuizz(newQuizz, function (err, quizz) {
-                    if (err) {
-                        res.status(500).send(err).end()
-                    } else {
-                        request(shortUrl+'newQuizz/'+quizz._id, { json: true }, (err, response, body) => {
-                            if (err) { return console.log(err); }
-                            quizz.shortUrl = body.short_id;
-                            quizz.save();
-                            res.send(quizz).end();
-                        });
-                    }
-                });
-            }
-
-        }else{
-            res.status(500).send({message: "Questions is empty"}).end()
+            Quizz.createQuizz(newQuizz, function (err, quizz) {
+                if (err) {
+                    res.status(500).send(err).end()
+                } else {
+                    request(shortUrl+'newQuizz/'+quizz._id, { json: true }, (err, response, body) => {
+                        if (err) { return console.log(err); }
+                        quizz.shortUrl = body.short_id;
+                        quizz.save();
+                        res.send(quizz).end();
+                    });
+                }
+            });
         }
+
+    }else{
+        res.status(500).send({message: "Questions is empty"}).end()
+    }
 };
 module.exports.report = function(req, res) {
     const user = req.user ? req.user: {_id: '0'};
@@ -107,9 +118,9 @@ module.exports.report = function(req, res) {
 
 
 module.exports.changeState = function(req, res) {
-        Quizz.changeState(req.params.id, function(err, quizz) {
-            res.send(quizz).end()
-        },(err) => res.status(500).send(err).end())
+    Quizz.changeState(req.params.id, function(err, quizz) {
+        res.send(quizz).end()
+    },(err) => res.status(500).send(err).end())
 };
 
 module.exports.close = function(req, res) {
