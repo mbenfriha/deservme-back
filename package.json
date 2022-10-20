@@ -29,7 +29,7 @@
     "express-session": "~1.14.1",
     "image-downloader": "^3.5.0",
     "jsonwebtoken": "^8.5.1",
-    "mongoose": "~4.13.1",
+    "mongoose": "~4.13.21",
     "multer": "^1.4.2",
     "passport": "~0.3.2",
     "passport-facebook": "~2.1.1",
